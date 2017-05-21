@@ -1,38 +1,38 @@
-var calculator = {
-  read: function () {
+function Calculator() {
+  this.read = function () {
     this.one = +prompt('Введите первое значение', '');
     this.two = +prompt('Введите второе значение', '');
-  },
-  sum: function () {
+  };
+  this.sum = function () {
     result = this.one + this.two;
-  },
-  mul: function () {
+  };
+  this.mul = function () {
     result = this.one * this.two;
-  },
-  div: function () {
+  };
+  this.div = function () {
     if (this.two != 0) {
       result = this.one / this.two;
     }
     else {
       result = ('Делить на ноль нельзя');
     }
-  },
-  sub: function () {
+  };
+  this.sub = function () {
     result = this.one - this.two;
-  },
-  getResult: function () {
+  };
+  this.getResult = function () {
     return result;
   }
-
-
 }
-calculator.read();
-calculator.sum();
-console.log(calculator.getResult());
-calculator.mul();
-console.log(calculator.getResult());
-calculator.div();
-console.log(calculator.getResult());
-calculator.sub();
-console.log(calculator.getResult());
+
+var calculateNumbers = new Calculator();
+calculateNumbers.read();
+calculateNumbers.sum();
+console.log(calculateNumbers.getResult());
+calculateNumbers.mul();
+console.log(calculateNumbers.getResult());
+calculateNumbers.div();
+console.log(calculateNumbers.getResult());
+calculateNumbers.sub();
+console.log(calculateNumbers.getResult());
 
