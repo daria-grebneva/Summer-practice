@@ -27,6 +27,6 @@ function extend(obj1, obj2) {
 extend(uncleFedor, catObject);
 console.log(uncleFedor);
 
-catObject.cate.name = 'Tom';  //Поменялось свойство в объекте cate, а этот объект лежит в дяде Федоре
+catObject.cat.name = 'Tom';  //Поменялось свойство в объекте cate, а этот объект лежит в дяде Федоре
 console.log(uncleFedor);
 
