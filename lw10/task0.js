@@ -1,5 +1,5 @@
 function checkMessage(inputString) {
-  var lowerStr = inputString.toLowerCase();
+  const lowerStr = inputString.toLowerCase();
   if (!!(~lowerStr.indexOf('чёрт побери'))) {
     console.log("Подскользнулся, упал. Очнулся - гипс");
   } else {

@@ -25,7 +25,7 @@ function Calculator() {
   }
 }
 
-var calculateNumbers = new Calculator();
+const calculateNumbers = new Calculator();
 calculateNumbers.read();
 calculateNumbers.sum();
 console.log(calculateNumbers.getResult());

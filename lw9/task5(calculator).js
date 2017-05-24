@@ -4,17 +4,17 @@ const DIVISION_OPERATOR = "/";
 const MULTIPLICATION_OPERATOR = "*";
 
 function askDigit() {
-  var value = prompt('Введите число', '');
+  let value = prompt('Введите число', '');
   return +value;
 }
 
 function askOperatior() {
-  var value = prompt('Введите знак операции', '');
+  let value = prompt('Введите знак операции', '');
   return value;
 }
 
 function calculate(operand1, operand2, operator) {
-  var result = null;
+  let result = null;
   if (operator == PLUS_OPERATOR) {
     result = operand1 + operand2;
   }
@@ -39,11 +39,11 @@ function calculate(operand1, operand2, operator) {
 }
 
 
-var operand1 = askDigit();
-var operator = askOperatior();
-var operand2 = askDigit();
+const operand1 = askDigit();
+const operator = askOperatior();
+const operand2 = askDigit();
 
-var result = calculate(operand1, operand2, operator);
-if (result || (result == 0) && (operator == DIVISION_OPERATOR && operand1 == 0) || (result == 0) && (operator != DIVISION_OPERATOR)) {
+let result = calculate(operand1, operand2, operator);
+if (!result || result) {
   alert(operand1 + operator + operand2 + " = " + result);
 }

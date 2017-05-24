@@ -1,4 +1,4 @@
-var calculator = {
+const calculator = {
   read: function () {
     calculator.one = +prompt('Введите первое значение', '');
     calculator.two = +prompt('Введите второе значение', '');

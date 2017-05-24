@@ -1,4 +1,4 @@
-var uncleFedor = {
+const uncleFedor = {
   girl: true,
   age: 6,
   name: 'Дядя Федор',
@@ -9,24 +9,15 @@ var uncleFedor = {
   }
 };
 
-var catObject = {
-  cat: {
+const catObject = {
     name: 'Matroskyn',
     food: 'fish',
     drink: 'milk'
-  }
 };
 
-function extend(obj1, obj2) {
-  for (var key in obj2) {
-    obj1[key] = obj2[key];
-  }
-  return obj1;
-}
-
-extend(uncleFedor, catObject);
+uncleFedor.cat = catObject;
 console.log(uncleFedor);
 
-catObject.cat.name = 'Tom';  //Поменялось свойство в объекте cate, а этот объект лежит в дяде Федоре
+catObject.name = 'Tom';  //Поменялось свойство в объекте cate, а этот объект лежит в дяде Федоре
 console.log(uncleFedor);
 
