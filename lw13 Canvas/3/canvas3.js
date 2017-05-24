@@ -1,4 +1,4 @@
-var example = document.getElementById("example");
+const example = document.getElementById("example");
 ctx = example.getContext('2d');
 
 function drawHouse() {
