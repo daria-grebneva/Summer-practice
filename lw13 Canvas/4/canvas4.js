@@ -8,18 +8,15 @@ function start() {
   addSpriteImage(ctx, 44, 160, 134, 35, 350, 350, 320, 78); //Горки
   addSpriteImage(ctx, 311, 941, 96, 17, 155, 84, 220, 40);  //Огонь
   addSpriteImage(ctx, 150, 825, 18, 36, 655, 300, 60, 130);  //Марио
-}
-function addSimpleImage(ctx) {
-  const pic = new Image();
-  pic.src = 'mario.jpg';
-  pic.onload = function () {
-    ctx.drawImage(pic, 0, 0);
-  }
+
 }
 
 function addSpriteImage(ctx, sx, sy, swidth, sheight, x, y, width, height) {
   const pic = new Image();
-  pic.src = 'mario_bg.gif';
+  pic.onload = function () {
+    pic.src = 'mario_bg.gif';
+  };
   ctx.drawImage(pic, sx, sy, swidth, sheight, x, y, width, height);
 }
+
 start();

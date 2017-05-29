@@ -1,5 +1,5 @@
 const example = document.getElementById("example");
-ctx = example.getContext('2d');
+const ctx = example.getContext('2d');
 
 function drawTriangle() {
   ctx.beginPath();
