@@ -15,11 +15,10 @@
 .container
 {
   padding: 0;
-  // width: 56.6%;
   width: 77.8%;
   height: 66.2%;
   position: absolute;
-  //left: 20%;
+  box-sizing: border-box;
   padding-left: 20%;
   top: 13.1%;
 }

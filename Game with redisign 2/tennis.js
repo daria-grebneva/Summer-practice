@@ -4,10 +4,10 @@ const ENEMY_COLOR = '#cc5653';
 const PLAYER_HEIGHT = 0.05;
 const PLAYER_WIDTH = 0.15;
 
-const BALL_SIZE = 40 / 2000;
+const BALL_SIZE = 50 / 2000;
 const BALL_SPEED = 4 / 1000;
-const MAX_SPEED = 10 / 15000;
-const BALL_RADIUS = 20 / 700;
+const MAX_SPEED = 10 / 1000;
+const BALL_RADIUS = 25 / 700;
 const BALL_COLOR = '#183c3d';
 
 const END_SCORE = 10;
@@ -154,7 +154,7 @@ class Game {
   }
 
   collision(objA, objB) {
-    let hasCollisionFromUpY = (objA._y + objA._height + objB._height / 2 > objB._y);
+    let hasCollisionFromUpY = (objA._y + objA._height + objB._height > objB._y);
     let hasCollisionsFromDownY = (objA._y < objB._y + objB._height);
     let hasCollisionFromLeftX = (objA._x + objA._width > objB._x);
     let hasCollisionsFromRightX = (objA._x < objB._x + objB._width);
@@ -163,11 +163,11 @@ class Game {
 
   _update() {
     this._moveEnemy();
-    if (this._ball._y - this._ball._height / 2 < 0) {
+    if (this._ball._y - this._ball._height < 0) {
       this._ball.vY = -this._ball.vY;
       this._player._score++;
     }
-    if (this._ball._y + this._ball._height / 2 > 1) {
+    if (this._ball._y + this._ball._height > 1) {
       this._ball.vY = -this._ball.vY;
       this._enemy._score++;
     }
@@ -181,14 +181,14 @@ class Game {
     if ((this.collision(this._enemy, this._ball) && this._ball.vY < 0) || (this.collision(this._player, this._ball) && this._ball.vY > 0)) {
       if (this._ball.vY < MAX_SPEED && -MAX_SPEED < this._ball.vY) {
         if (this._ball.vX < 0) {
-          this._ball.vY--;
+          this._ball.vY = this._ball.vY - 1 / 1000;
         } else {
-          this._ball.vY++;
+          this._ball.vY = this._ball.vY + 1 / 1000;
         }
         if (this._ball.vX < 0) {
-          this._ball.vX--;
+          this._ball.vX = this._ball.vX - 1 / 1000;
         } else {
-          this._ball.vX++;
+          this._ball.vX = this._ball.vX + 1 / 1000;
         }
       }
       this._ball.vY = -this._ball.vY;
@@ -237,7 +237,7 @@ class Game {
       this._context.globalAlpha = 1;
       this._context.fillRect(0, 0, canvas.scrollWidth, canvas.scrollHeight);
       this._context.fillStyle = FONT_COLOR;
-      this._context.font = this._canvas.height * 1/7  + 'px lobster';
+      this._context.font = this._canvas.height * 1 / 7 + 'px lobster';
       this._context.fillText('GAME TENNIS', this._canvas.width * 1 / 10, this._canvas.height * 1 / 10);
       this._context.textBaseline = 'top';
       if (this._numberOfGames > 0) {
@@ -254,7 +254,7 @@ class Game {
       text = 'YOU ARE'
     }
     this._context.fillStyle = SCORE_COLOR;
-    this._context.font = this._canvas.height * 1/10  + 'px lobster';
+    this._context.font = this._canvas.height * 1 / 10 + 'px lobster';
     this._context.fillText(text + ' A WINNER', this._canvas.width * 1 / 10, this._canvas.height * 2.6 / 10);
     this._context.textBaseline = 'top';
   }
