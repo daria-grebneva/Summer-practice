@@ -1,10 +1,11 @@
 .game_console
 {
-  background: url("../img/background_1.jpg");
+  background: url(../img/background_1.jpg);
   background-size: 100%;
   background-repeat: no-repeat;
   width: 100%;
-  height: 100%;
+  height: 0;
+  padding-bottom: 48.8%;
   position: absolute;
   top: 0;
   left: 0;
@@ -13,157 +14,17 @@
 
 .container
 {
-  width: 80%;
-  /*  height: 79%;*/
-  height: 100%;
+  padding: 0;
+  // width: 56.6%;
+  width: 77.8%;
+  height: 66.2%;
   position: absolute;
+  //left: 20%;
   padding-left: 20%;
-  padding-top: 5%;
-  padding-bottom: 9%;
-  @media (screen and max-width: 1885px) {
-    padding-bottom: 10%;
-  }
-  @media (screen and max-width: 1850px) {
-    padding-bottom: 11%;
-  }
-  @media (screen and max-width: 1815px) {
-    padding-bottom: 12%;
-  }
-  @media (screen and max-width: 1780px) {
-    padding-bottom: 13%;
-  }
-  @media (screen and max-width: 1745px) {
-    padding-bottom: 14%;
-  }
-  @media (screen and max-width: 1715px) {
-    padding-bottom: 15%;
-  }
-  @media (screen and max-width: 1680px) {
-    padding-bottom: 16%;
-  }
-  @media (screen and max-width: 1645px) {
-    padding-bottom: 17%;
-  }
-  @media (screen and max-width: 1615px) {
-    padding-bottom: 18%;
-  }
-  @media (screen and max-width: 1585px) {
-    padding-bottom: 20%;
-  }
-  @media (screen and max-width: 1525px) {
-    padding-bottom: 22%;
-  }
-  @media (screen and max-width: 1485px) {
-    padding-bottom: 24%;
-  }
-  @media (screen and max-width: 1440px) {
-    padding-bottom: 26%;
-  }
-  @media (screen and max-width: 1415px) {
-    padding-bottom: 27%;
-  }
-  @media (screen and max-width: 1380px) {
-    padding-bottom: 28%;
-  }
-  @media (screen and max-width: 1360px) {
-    padding-bottom: 29%;
-  }
-  @media (screen and max-width: 1340px) {
-    padding-bottom: 30%;
-  }
-  @media (screen and max-width: 1320px) {
-    padding-bottom: 31%;
-  }
-  @media (screen and max-width: 1305px) {
-    padding-bottom: 32%;
-  }
-  @media (screen and max-width: 1285px) {
-    padding-bottom: 33%;
-  }
-  @media (screen and max-width: 1270px) {
-    padding-bottom: 34%;
-  }
-  @media (screen and max-width: 1250px) {
-    padding-bottom: 35%;
-  }
-  @media (screen and max-width: 1235px) {
-    padding-bottom: 36%;
-  }
-  @media (screen and max-width: 1220px) {
-    padding-bottom: 37%;
-  }
-  @media (screen and max-width: 1215px) {
-    padding-bottom: 38%;
-  }
-  @media (screen and max-width: 1180px) {
-    padding-bottom: 39%;
-  }
-  @media (screen and max-width: 1170px) {
-    padding-bottom: 40%;
-  }
-  @media (screen and max-width: 1160px) {
-    padding-bottom: 41%;
-  }
-  @media (screen and max-width: 1150px) {
-    padding-bottom: 42%;
-  }
-  @media (screen and max-width: 1140px) {
-    padding-bottom: 43%;
-  }
-  @media (screen and max-width: 1120px) {
-    padding-bottom: 44%;
-  }
-  @media (screen and max-width: 1105px) {
-    padding-bottom: 45%;
-  }
-  @media (screen and max-width: 1090px) {
-    padding-bottom: 46%;
-  }
-  @media (screen and max-width: 1075px) {
-    padding-bottom: 47%;
-  }
-  @media (screen and max-width: 1060px) {
-    padding-bottom: 48%;
-  }
-  @media (screen and max-width: 1045px) {
-    padding-bottom: 50%;
-  }
-  @media (screen and max-width: 1030px) {
-    padding-bottom: 51%;
-  }
-  @media (screen and max-width: 1020px) {
-    padding-bottom: 52%;
-  }
-  @media (screen and max-width: 1010px) {
-    padding-bottom: 53%;
-  }
-  @media (screen and max-width: 1000px) {
-    padding-bottom: 54%;
-  }
-  @media (screen and max-width: 990px) {
-    padding-bottom: 55%;
-  }
-  @media (screen and max-width: 975px) {
-    padding-bottom: 56%;
-  }
-  @media (screen and max-width: 965px) {
-    padding-bottom: 57%;
-  }
-  @media (screen and max-width: 955px) {
-    padding-bottom: 58%;
-  }
-  @media (screen and max-width: 950px) {
-    padding-bottom: 59%;
-  }
-  @media (screen and max-width: 940px) {
-    padding-bottom: 60%;
-  }
-  @media (screen and max-width: 930px) {
-    padding-bottom: 61%;
-  }
-  @media (screen and max-width: 920px) {
-    padding-bottom: 62%;
-  }
-
-
+  top: 13.1%;
+}
+.game_canvas
+{
+  width: 100%;
+  height: 100%;
 }
