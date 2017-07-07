@@ -6,11 +6,20 @@ const BALL_COLOR = '#183c3d';//'#183c3d'
 
 const MAX_DOTS_NUMBER = 5;
 
-const SMALL_BALL_SIZE = 10 / 2000;
-const SMALL_BALL_RADIUS = 5 / 700;
+const SMALL_BALL_SIZE = 20 / 2000;
+const SMALL_BALL_RADIUS = 10 / 700;
 const SMALL_BALL_COLOR = 'red';
 
-const BACKGROUND_COLOR = 'white';
+const BACKGROUND_COLOR = 'red';
+
+const CONVERGENCE_RADIUS = 5 / 15;
+
+const ENEMY_SPEED = 4 / 1000;
+const ENEMY_SIZE = 65 / 2000;
+const ENEMY_RADIUS = 40 / 700;
+
+const FIELD_COLOR = '#d7f4de';
+const FONT_COLOR = '#937cdd';
 
 class Shape {
   constructor(canvas, x, y, width, height, color) {
@@ -77,11 +86,12 @@ class Circle extends Shape {
 }
 
 class Dot extends Circle {
-  constructor(canvas, color, x, y, width, height, radius, counter) {
+  constructor(canvas, color, x, y, width, height, radius) {
     super(canvas, color, x, y, width, height, radius);
-    this._counter = counter;
   }
 }
+
+//TODO :: доделать коллизии со стенами и полом с потолком, бот должен кушать игрока
 
 class Game {
   constructor() {
@@ -90,19 +100,19 @@ class Game {
     this._start = false;
     this._playerWin = true;
     this._numberOfGames = 0;
-    this._field = new Field(this._canvas, 0, 0, 1, 1, BACKGROUND_COLOR);
-    this._ball = new Circle(this._canvas, BALL_COLOR, 1 / 2, 1 / 2, BALL_SIZE, BALL_SIZE, BALL_RADIUS);
-    this._dot = [];
-    /* for (this._i = 0; this._i != MAX_DOTS_NUMBER; this._i++) {
-     this._dot[this._i] = new Dot(this._canvas, SMALL_BALL_COLOR, this.getRandomizer(0, 1), this.getRandomizer(0, 1), SMALL_BALL_SIZE, SMALL_BALL_SIZE, SMALL_BALL_RADIUS, this._counter);
-     }*/
+    this._field = new Field(this._canvas, 0, 0, 1,1, BACKGROUND_COLOR);
+    this._player = new Circle(this._canvas, BALL_COLOR, 1 / 2, 1 / 2, BALL_SIZE, BALL_SIZE, BALL_RADIUS);
+    this._enemy = new Circle(this._canvas, this._getRandomColor(), this._getRandomCoordinates(0, 1), this._getRandomCoordinates(0, 1), ENEMY_SIZE, ENEMY_SIZE, ENEMY_RADIUS);
+    this._dotsMaxNumber = MAX_DOTS_NUMBER;
     this._newDot();
-    //this._ball = new Circle(this._canvas, BALL_COLOR, 1 / 2, 1 / 2, BALL_SIZE, BALL_SIZE, BALL_RADIUS);
     this._canvas.onclick = (event) => {
       this._startGame();
     };
-    this._canvas.addEventListener("mousemove", (event) => {
-      this.playerMove(event, this._ball._radius);
+  /*  this._canvas.addEventListener("mousemove", (event) => {
+      this.playerMove(event, this._player._radius);
+    });*/
+    this._canvas.addEventListener("mouseControl", (event) => {
+      this.playerMove(event, this._player._radius);
     });
     window.addEventListener("resize", () => {
       this.resize();
@@ -111,23 +121,75 @@ class Game {
     requestAnimationFrame(this.onLoop.bind(this));
   }
 
-  getRandomizer(min, max) {
+  _getRandomCoordinates(min, max) {
     return Math.random() * (max - min) + min;
   }
 
   _newDot() {
     this._dot = [];
     for (let i = 0; i != MAX_DOTS_NUMBER; i++) {
-      this._dot[i] = new Dot(this._canvas, this._getRandomColor(), this.getRandomizer(0, 1), this.getRandomizer(0, 1), SMALL_BALL_SIZE, SMALL_BALL_SIZE, SMALL_BALL_RADIUS, this._counter);
+      this._dot[i] = new Dot(this._canvas, this._getRandomColor(), this._getRandomCoordinates(0, 1), this._getRandomCoordinates(0, 1), SMALL_BALL_SIZE, SMALL_BALL_SIZE, SMALL_BALL_RADIUS);
     }
   }
 
   _drawDot() {
-    for (this._i = 0; this._i != MAX_DOTS_NUMBER; this._i++) {
-      this._dot[this._i].draw();
-
+    for (let i = 0; i != this._dotsMaxNumber; i++) {
+      this._dot[i].draw();
     }
-    this.deleteBall();
+    // this._addDot();
+    this._deleteDot();
+  }
+
+  _deleteDot() {
+    for (let i = 0; i != this._dotsMaxNumber; i++) {
+      if (this._eatDotCondition(this._player, this._dot[i]) == true || this._eatDotCondition(this._enemy, this._dot[i]) == true) {
+        if (this._eatDotCondition(this._player, this._dot[i]) == true) {
+          /* this._field._width = this._field._width * 2;
+           this._field._height = this._field._height * 2;
+           console.log(this._field._width, this._field._height)*/
+        }
+        this._dot.splice(i, 1);
+        if (this._dotsMaxNumber != 1) {
+          this._dotsMaxNumber--;
+        }
+        this._addDot(i);
+        i = 0;
+      }
+    }
+  }
+
+  _eatPlayer() {
+    if (this._enemy._width > this._player._width) {
+      if (this._eatDotCondition(this._enemy, this._player) == true) {
+        return true;
+      }
+    } else if (this._player._width > this._enemy._width) {
+      if (this._eatDotCondition(this._player, this._enemy) == true) {
+        delete  this._enemy;
+        return false;
+      }
+    }
+  }
+
+
+  _eatDotCondition(eatingPlayer, food) {
+    if (((eatingPlayer._x - eatingPlayer._width / 2 - food._width) < food._x
+      && food._x < (eatingPlayer._x + eatingPlayer._width - food._width))
+      && ((eatingPlayer._y - eatingPlayer._height - food._height) < food._y
+      && food._y < (eatingPlayer._y + eatingPlayer._height + food._height) )) {
+      eatingPlayer._width = eatingPlayer._width + BALL_SIZE * BALL_SIZE;
+      eatingPlayer._height = eatingPlayer._height + BALL_SIZE * BALL_SIZE;
+      eatingPlayer._radius = eatingPlayer._radius + BALL_RADIUS * BALL_SIZE;
+      return true;
+    }
+  }
+
+  _addDot(i) {
+    if (this._dotsMaxNumber != MAX_DOTS_NUMBER) {
+      i = MAX_DOTS_NUMBER;
+      i--;
+      this._dot[i] = new Dot(this._canvas, 'blue', this._getRandomCoordinates(0, 1), this._getRandomCoordinates(0, 1), SMALL_BALL_SIZE, SMALL_BALL_SIZE, SMALL_BALL_RADIUS);
+    }
   }
 
   _getRandomColor() {
@@ -139,18 +201,6 @@ class Game {
     return this._colorNum;
   }
 
-  deleteBall() {
-    for (this._i = 0; this._i != MAX_DOTS_NUMBER; this._i++) {
-      if (((this._ball._x - this._ball._width / 2 - this._dot[this._i]._width) < this._dot[this._i]._x
-        && this._dot[this._i]._x < (this._ball._x + this._ball._width - this._dot[this._i]._width))
-        && ((this._ball._y - this._ball._height - this._dot[this._i]._height) < this._dot[this._i]._y
-        && this._dot[this._i]._y < (this._ball._y + this._ball._height + this._dot[this._i]._height) )) {
-        delete this._dot[this._i];
-
-        console.log(this._i);
-      }
-    }
-  }
 
   resize() {
     let canvas = this._canvas;
@@ -164,23 +214,85 @@ class Game {
     return false;
   }
 
-  _randomColor() {
-    let color = 'rgb(' + Math.random(0, 255) + ',' + Math.random(0, 255) + ',' + Math.random(0, 255) + ')';
-    //  console.log(color);
-    return color;
-  }
+  /*  _randomColor() {
+   let color = 'rgb(' + Math.random(0, 255) + ',' + Math.random(0, 255) + ',' + Math.random(0, 255) + ')';
+   return color;
+   }*/
 
   playerMove(event, player_width) {
     if (this._start) {
       let x = event.offsetX / this._canvas.clientWidth;
       let y = event.offsetY / this._canvas.clientHeight;
       if ((player_width < x) && x < (1 + player_width / 2)) {
-        this._ball._x = x - player_width / 2;
+        this._player._x = x - player_width / 2;
       }
       if ((player_width * 2 < y) && y < (1 + player_width / 2)) {
-        this._ball._y = y - player_width;
+        this._player._y = y - player_width;
       }
     }
+  }
+
+  enemyMove() {
+    if (this._start) {
+      let speedEnemy = ENEMY_SPEED;
+      if ((this._positionRight() || this._positionLeft()) && (this._positionDown() || this._positionUp())) {
+        if (this._positionRight()) {
+          this._enemy._x += speedEnemy;
+        } else if (this._positionLeft()) {
+          this._enemy._x -= speedEnemy;
+        }
+        if (this._positionDown()) {
+          this._enemy._y += speedEnemy;
+        }
+        else if (this._positionUp()) {
+          this._enemy._y -= speedEnemy;
+        }
+        //TODO :: доделать коллизии со стенами и полом с потолком
+        //Стена
+      } else if ((this._enemy._x - this._enemy._width / 2 < 0) || (this._enemy._x + this._enemy._width / 2 > 1)) {
+        speedEnemy = -speedEnemy;
+        //Пол
+      } else if (this._enemy._y - this._enemy._height < 0) {
+        this._enemy._x -= speedEnemy;
+        this._enemy._y += speedEnemy;
+        //Потолок
+      } else if (this._enemy._y + this._enemy._height > 1) {
+        speedEnemy = -speedEnemy;
+      } else {
+        this._enemy._x -= speedEnemy;
+        this._enemy._y -= speedEnemy;
+      }
+
+    }
+  }
+
+  _positionRight() {
+    if ((this._player._x - this._enemy._x) < CONVERGENCE_RADIUS && (this._player._x + this._enemy._width / 2 - this._enemy._x) > 0) {
+      return true;
+    }
+  }
+
+  _positionLeft() {
+    if ((this._enemy._x - this._player._x) < CONVERGENCE_RADIUS && (this._enemy._x + this._enemy._width / 2 - this._player._x) > 0) {
+      return true;
+    }
+  }
+
+  _positionUp() {
+    if ((this._enemy._y - this._player._y) < CONVERGENCE_RADIUS && (this._enemy._y + this._enemy._height / 2 - this._player._y) > 0) {
+      return true;
+    }
+  }
+
+  _positionDown() {
+    if ((this._player._y - this._enemy._y) < CONVERGENCE_RADIUS && (this._player._y + this._enemy._height / 2 - this._enemy._y) > 0) {
+      return true;
+    }
+  }
+
+
+  _updateEnemyCoordinates() {
+
   }
 
   _startGame() {
@@ -189,21 +301,42 @@ class Game {
     }
   }
 
+  _endGame() {
+    if (this._eatPlayer() == true) {
+      this._start = false;
+      this._numberOfGames++;
+    }
+  }
+
+  _gameWallpaper() {
+    if (!this._start) {
+      this._context.fillStyle = FIELD_COLOR;
+      this._context.globalAlpha = 1;
+      this._context.fillRect(0, 0, canvas.scrollWidth, canvas.scrollHeight);
+      this._context.fillStyle = FONT_COLOR;
+      this._context.font = this._canvas.height * 1 / 7 + 'px slabo';
+      this._context.fillText('AGARIO', this._canvas.width * 1 / 10, this._canvas.height * 2 / 10);
+      this._context.font = this._canvas.height * 1 / 9 + 'px slabo';
+      this._context.fillText('Click to continue', this._canvas.width * 1 / 10, this._canvas.height * 3 / 10);
+      if (this._numberOfGames > 0) {
+        this._context.font = this._canvas.height * 1 / 9 + 'px slabo';
+        this._context.fillText('You ate', this._canvas.width * 1 / 10, this._canvas.height * 4 / 10);
+      }
+    }
+  }
+
   _update() {
-    //  this.deleteBall();
+    this.enemyMove();
+    this._endGame();
   }
 
   _draw() {
     this._context.clearRect(0, 0, this._canvas.width, this._canvas.height);
     this._field.draw(this._canvas.width, this._canvas.height);
-    this._ball.draw();
+    this._player.draw();
+    this._enemy.draw();
     this._drawDot();
-    let color = '\'rgb(' + Math.random(0, 255) + ',' + Math.random(0, 255) + ',' + Math.random(0, 255) + ')\'';
-    console.log(color);
-    // this._randomColor();
-    /* this._arr[1].draw();
-     this._arr[2].draw();
-     this._arr[3].draw();*/
+    this._gameWallpaper();
   }
 
 
