@@ -1,8 +1,7 @@
 const BALL_SIZE = 50 / 2000;
-const BALL_SPEED = 4 / 1000;
-const MAX_SPEED = 10 / 1000;
 const BALL_RADIUS = 25 / 700;
 const BALL_COLOR = '#183c3d';//'#183c3d'
+const PLAYER_SPEED = 100;
 
 const MAX_DOTS_NUMBER = 5;
 
@@ -10,7 +9,7 @@ const SMALL_BALL_SIZE = 20 / 2000;
 const SMALL_BALL_RADIUS = 10 / 700;
 const SMALL_BALL_COLOR = 'red';
 
-const BACKGROUND_COLOR = 'red';
+const BACKGROUND_COLOR = '#ffffff';
 
 const CONVERGENCE_RADIUS = 5 / 15;
 
@@ -20,6 +19,7 @@ const ENEMY_RADIUS = 40 / 700;
 
 const FIELD_COLOR = '#d7f4de';
 const FONT_COLOR = '#937cdd';
+
 
 class Shape {
   constructor(canvas, x, y, width, height, color) {
@@ -68,9 +68,10 @@ class Field extends Rectangle {
 
 
 class Circle extends Shape {
-  constructor(canvas, color, x, y, width, height, radius) {
+  constructor(canvas, color, x, y, width, height, radius, speed) {
     super(canvas, x, y, width, height, color);
     this._radius = radius;
+    this._speed = speed;
   }
 
   get radius() {
@@ -91,7 +92,6 @@ class Dot extends Circle {
   }
 }
 
-//TODO :: доделать коллизии со стенами и полом с потолком, бот должен кушать игрока
 
 class Game {
   constructor() {
@@ -100,19 +100,18 @@ class Game {
     this._start = false;
     this._playerWin = true;
     this._numberOfGames = 0;
-    this._field = new Field(this._canvas, 0, 0, 1,1, BACKGROUND_COLOR);
-    this._player = new Circle(this._canvas, BALL_COLOR, 1 / 2, 1 / 2, BALL_SIZE, BALL_SIZE, BALL_RADIUS);
-    this._enemy = new Circle(this._canvas, this._getRandomColor(), this._getRandomCoordinates(0, 1), this._getRandomCoordinates(0, 1), ENEMY_SIZE, ENEMY_SIZE, ENEMY_RADIUS);
-    this._dotsMaxNumber = MAX_DOTS_NUMBER;
-    this._newDot();
+    this._field = new Field(this._canvas, 0, 0, 1, 1, BACKGROUND_COLOR);
+    this._player = new Circle(this._canvas, BALL_COLOR, 1 / 2, 1 / 2, BALL_SIZE, BALL_SIZE, BALL_RADIUS, PLAYER_SPEED);
+    this._enemy = new Circle(this._canvas, this._getRandomColor(), this._getRandomCoordinates(0, 1), this._getRandomCoordinates(0, 1), ENEMY_SIZE, ENEMY_SIZE, ENEMY_RADIUS, ENEMY_SPEED);
+    this._dot = [];
+    this._addDot();
     this._canvas.onclick = (event) => {
       this._startGame();
     };
-  /*  this._canvas.addEventListener("mousemove", (event) => {
-      this.playerMove(event, this._player._radius);
-    });*/
-    this._canvas.addEventListener("mouseControl", (event) => {
-      this.playerMove(event, this._player._radius);
+    this._canvas.addEventListener("mousemove", (event) => {
+      setTimeout(() => {
+        this.playerMove(event, this._player._radius)
+      }, this._player._speed);
     });
     window.addEventListener("resize", () => {
       this.resize();
@@ -125,36 +124,27 @@ class Game {
     return Math.random() * (max - min) + min;
   }
 
-  _newDot() {
-    this._dot = [];
-    for (let i = 0; i != MAX_DOTS_NUMBER; i++) {
-      this._dot[i] = new Dot(this._canvas, this._getRandomColor(), this._getRandomCoordinates(0, 1), this._getRandomCoordinates(0, 1), SMALL_BALL_SIZE, SMALL_BALL_SIZE, SMALL_BALL_RADIUS);
-    }
-  }
-
   _drawDot() {
-    for (let i = 0; i != this._dotsMaxNumber; i++) {
+    for (let i = 0; i != MAX_DOTS_NUMBER; i++) {
       this._dot[i].draw();
     }
-    // this._addDot();
     this._deleteDot();
   }
 
   _deleteDot() {
-    for (let i = 0; i != this._dotsMaxNumber; i++) {
+    for (let i = 0; i != MAX_DOTS_NUMBER; i++) {
       if (this._eatDotCondition(this._player, this._dot[i]) == true || this._eatDotCondition(this._enemy, this._dot[i]) == true) {
         if (this._eatDotCondition(this._player, this._dot[i]) == true) {
-          /* this._field._width = this._field._width * 2;
-           this._field._height = this._field._height * 2;
-           console.log(this._field._width, this._field._height)*/
         }
         this._dot.splice(i, 1);
-        if (this._dotsMaxNumber != 1) {
-          this._dotsMaxNumber--;
-        }
-        this._addDot(i);
-        i = 0;
+        this._addDot();
       }
+    }
+  }
+
+  _addDot() {
+    for (let i = 0; MAX_DOTS_NUMBER - this._dot.length > 0; i++) {
+      this._dot.push(new Dot(this._canvas, this._getRandomColor(), this._getRandomCoordinates(0, 1), this._getRandomCoordinates(0, 1), SMALL_BALL_SIZE, SMALL_BALL_SIZE, SMALL_BALL_RADIUS));
     }
   }
 
@@ -180,17 +170,11 @@ class Game {
       eatingPlayer._width = eatingPlayer._width + BALL_SIZE * BALL_SIZE;
       eatingPlayer._height = eatingPlayer._height + BALL_SIZE * BALL_SIZE;
       eatingPlayer._radius = eatingPlayer._radius + BALL_RADIUS * BALL_SIZE;
+      eatingPlayer._speed = eatingPlayer._speed * 1.05;
       return true;
     }
   }
 
-  _addDot(i) {
-    if (this._dotsMaxNumber != MAX_DOTS_NUMBER) {
-      i = MAX_DOTS_NUMBER;
-      i--;
-      this._dot[i] = new Dot(this._canvas, 'blue', this._getRandomCoordinates(0, 1), this._getRandomCoordinates(0, 1), SMALL_BALL_SIZE, SMALL_BALL_SIZE, SMALL_BALL_RADIUS);
-    }
-  }
 
   _getRandomColor() {
     this._letters = '0123456789ABCDEF';
@@ -199,6 +183,10 @@ class Game {
       this._colorNum += this._letters[Math.floor(Math.random() * 16)];
     }
     return this._colorNum;
+  }
+
+  _getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
   }
 
 
@@ -214,11 +202,6 @@ class Game {
     return false;
   }
 
-  /*  _randomColor() {
-   let color = 'rgb(' + Math.random(0, 255) + ',' + Math.random(0, 255) + ',' + Math.random(0, 255) + ')';
-   return color;
-   }*/
-
   playerMove(event, player_width) {
     if (this._start) {
       let x = event.offsetX / this._canvas.clientWidth;
@@ -232,67 +215,83 @@ class Game {
     }
   }
 
+
   enemyMove() {
     if (this._start) {
       let speedEnemy = ENEMY_SPEED;
-      if ((this._positionRight() || this._positionLeft()) && (this._positionDown() || this._positionUp())) {
-        if (this._positionRight()) {
+      let i = this._getRandomInt(0, this._dot.length);
+      if ((this._positionRight(this._player, this._enemy, CONVERGENCE_RADIUS) || this._positionLeft(this._player, this._enemy, CONVERGENCE_RADIUS)) && (this._positionDown(this._player, this._enemy, CONVERGENCE_RADIUS) || this._positionUp(this._player, this._enemy, CONVERGENCE_RADIUS))) {
+        if (this._positionRight(this._player, this._enemy, CONVERGENCE_RADIUS)) {
           this._enemy._x += speedEnemy;
-        } else if (this._positionLeft()) {
+        } else if (this._positionLeft(this._player, this._enemy, CONVERGENCE_RADIUS)) {
           this._enemy._x -= speedEnemy;
         }
-        if (this._positionDown()) {
+        if (this._positionDown(this._player, this._enemy, CONVERGENCE_RADIUS)) {
           this._enemy._y += speedEnemy;
         }
-        else if (this._positionUp()) {
+        else if (this._positionUp(this._player, this._enemy, CONVERGENCE_RADIUS)) {
           this._enemy._y -= speedEnemy;
         }
-        //TODO :: доделать коллизии со стенами и полом с потолком
-        //Стена
-      } else if ((this._enemy._x - this._enemy._width / 2 < 0) || (this._enemy._x + this._enemy._width / 2 > 1)) {
-        speedEnemy = -speedEnemy;
-        //Пол
-      } else if (this._enemy._y - this._enemy._height < 0) {
-        this._enemy._x -= speedEnemy;
-        this._enemy._y += speedEnemy;
-        //Потолок
-      } else if (this._enemy._y + this._enemy._height > 1) {
-        speedEnemy = -speedEnemy;
-      } else {
-        this._enemy._x -= speedEnemy;
-        this._enemy._y -= speedEnemy;
       }
+      else {
+        this._getNearestDot();
+      }
+    }
 
+  }
+
+  _getNearestDot() {
+    let coordinate_x = 1;
+    let coordinate_y = 1;
+    let newCoordinate_x = 0;
+    let newCoordinate_y = 0;
+    let numberNearestDot = 0;
+    for (let i = 0; i != MAX_DOTS_NUMBER; i++) {
+      newCoordinate_x = Math.abs(this._enemy._x - this._dot[i]._x);
+      newCoordinate_y = Math.abs(this._enemy._y - this._dot[i]._y);
+      if ((newCoordinate_x < coordinate_x) && (newCoordinate_y < coordinate_y)) {
+        coordinate_x = newCoordinate_x;
+        coordinate_y = newCoordinate_y;
+        numberNearestDot = i;
+      }
+      if (i == MAX_DOTS_NUMBER - 1) {
+        if (this._dot[numberNearestDot]._x > this._enemy._x) {
+          this._enemy._x += ENEMY_SPEED;
+        } else if (this._dot[numberNearestDot]._x < this._enemy._x) {
+          this._enemy._x -= ENEMY_SPEED;
+        }
+        if (this._dot[numberNearestDot]._y > this._enemy._y) {
+          this._enemy._y += ENEMY_SPEED;
+        }
+        else if (this._dot[numberNearestDot]._y < this._enemy._y) {
+          this._enemy._y -= ENEMY_SPEED;
+        }
+      }
     }
   }
 
-  _positionRight() {
-    if ((this._player._x - this._enemy._x) < CONVERGENCE_RADIUS && (this._player._x + this._enemy._width / 2 - this._enemy._x) > 0) {
+  _positionRight(first_obj, second_obj, radius) {
+    if ((first_obj._x - second_obj._x) <= radius && (first_obj._x + second_obj._width / 2 - second_obj._x) > 0) {
       return true;
     }
   }
 
-  _positionLeft() {
-    if ((this._enemy._x - this._player._x) < CONVERGENCE_RADIUS && (this._enemy._x + this._enemy._width / 2 - this._player._x) > 0) {
+  _positionLeft(first_obj, second_obj, radius) {
+    if ((second_obj._x - first_obj._x) <= radius && (second_obj._x + second_obj._width / 2 - first_obj._x) > 0) {
       return true;
     }
   }
 
-  _positionUp() {
-    if ((this._enemy._y - this._player._y) < CONVERGENCE_RADIUS && (this._enemy._y + this._enemy._height / 2 - this._player._y) > 0) {
+  _positionUp(first_obj, second_obj, radius) {
+    if ((second_obj._y - first_obj._y) < radius && (second_obj._y + second_obj._height / 2 - first_obj._y) > 0) {
       return true;
     }
   }
 
-  _positionDown() {
-    if ((this._player._y - this._enemy._y) < CONVERGENCE_RADIUS && (this._player._y + this._enemy._height / 2 - this._enemy._y) > 0) {
+  _positionDown(first_obj, second_obj, radius) {
+    if ((first_obj._y - second_obj._y) < radius && (first_obj._y + second_obj._height / 2 - second_obj._y) > 0) {
       return true;
     }
-  }
-
-
-  _updateEnemyCoordinates() {
-
   }
 
   _startGame() {
