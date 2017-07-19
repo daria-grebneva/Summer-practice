@@ -97,7 +97,6 @@ class Game {
     this._start = false;
     this._playerWin = true;
     this._numberOfGames = 0;
-    //field
     this._field = new Field(this._canvas, 0, 0, 1, 1, BACKGROUND_COLOR);
     this._enemy = new Player(this._canvas, 1 / 2 - PLAYER_HEIGHT, 0, PLAYER_WIDTH, PLAYER_HEIGHT, ENEMY_COLOR);
     this._player = new Player(this._canvas, 1 / 2 - PLAYER_HEIGHT, 1 - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_COLOR);
