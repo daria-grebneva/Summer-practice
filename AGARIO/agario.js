@@ -171,10 +171,10 @@ class Game {
           return true;
         }
       } else if (this._player._width > this._enemy[j]._width) {
-        if ((this._eatDotCondition(this._player, this._enemy[j]) == true) ||
-          //TODO ::  Разобраться с логикой съедания противников
-          (this._eatEachOtherEnemy(this._enemy[j]) == true))
+        if (this._eatDotCondition(this._player, this._enemy[j]) == true)
           this._enemy.splice(j, 1);
+        return false;
+      } else if (this._eatEachOtherEnemy(this._enemy[j]) == true) {
         return false;
       }
     }
@@ -184,7 +184,11 @@ class Game {
   //TODO ::  Логика съедания противников
   _eatEachOtherEnemy(lala) {
     for (let k = 0; k != MAX_ENEMY_NUMBER; k++) {
-      if ((this._eatDotCondition(this._enemy[k], lala) == true) || (this._eatDotCondition(lala, this._enemy[k]) == true)) {
+      if (this._eatDotCondition(this._enemy[k], lala) == true) {
+        this._enemy.splice(lala, 1);
+        return true;
+      } else if (this._eatDotCondition(lala, this._enemy[k]) == true) {
+        this._enemy.splice(k, 1);
         return true;
       }
     }
