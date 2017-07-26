@@ -10,7 +10,11 @@
       <div class="container">
         <canvas class="game_canvas" id='canvas'>Обновите браузер</canvas>
       </div>
-      <script type="text/javascript" src="agario.js"></script>
     </div>
+      <script src="lib/require.js"></script>
+      <script src="build/bundle.js"></script>
+      <script>
+        require(["game"]);
+      </script>
   </body>
 </html>
