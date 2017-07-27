@@ -9,12 +9,10 @@
 
 .container {
   padding: 0;
-  width: 90%;
-  height: 90%;
+  width: 99%;
+  height: 97%;
   position: absolute;
-  box-sizing: border-box;
-  padding-left: 5%;
-  top: 5%; }
+  box-sizing: border-box; }
 
 .game_canvas {
   width: 100%;
