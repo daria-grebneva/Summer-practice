@@ -1,6 +1,6 @@
 import {Circle} from "./circle"
 export class Dot extends Circle {
-    constructor(canvas: any, color: any, x: number, y: number, width: number, height: number, _radius: number) {
-        super(canvas, color, x, y, width, height, _radius);
+    constructor(context: CanvasRenderingContext2D, canvas: HTMLCanvasElement, _x: number, _y: number, _width: number, _height: number, color: any, _radius: number) {
+        super(context, canvas, _x, _y, _width, _height, color, _radius);
     }
 }

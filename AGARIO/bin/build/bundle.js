@@ -12,13 +12,12 @@ define("shape", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Shape = (function () {
-        function Shape(canvas, _x, _y, _width, _height, color) {
+        function Shape(context, canvas, _x, _y, _width, _height, color) {
+            this.canvas = canvas;
             this.x = _x;
             this.y = _y;
             this.width = _width;
             this.height = _height;
-            this.canvas = canvas;
-            this.context = canvas.getContext("2d");
             this.color = color;
         }
         Object.defineProperty(Shape.prototype, "_x", {
@@ -58,13 +57,12 @@ define("rectangle", ["require", "exports", "shape"], function (require, exports,
     Object.defineProperty(exports, "__esModule", { value: true });
     var Rectangle = (function (_super) {
         __extends(Rectangle, _super);
-        function Rectangle(canvas, _x, _y, _width, _height, color) {
-            return _super.call(this, canvas, _x, _y, _width, _height, color) || this;
+        function Rectangle(context, canvas, _x, _y, _width, _height, color) {
+            return _super.call(this, context, canvas, _x, _y, _width, _height, color) || this;
         }
-        Rectangle.prototype.draw = function () {
-            console.log('draw Field');
-            this.context.fillStyle = this.color;
-            this.context.fillRect(this.x, this.y, this.width, this.height);
+        Rectangle.prototype.draw = function (context) {
+            context.fillStyle = this.color;
+            context.fillRect(this._x, this._y, this._width, this._height);
         };
         return Rectangle;
     }(shape_1.Shape));
@@ -75,8 +73,8 @@ define("field", ["require", "exports", "rectangle"], function (require, exports,
     Object.defineProperty(exports, "__esModule", { value: true });
     var Field = (function (_super) {
         __extends(Field, _super);
-        function Field(canvas, _x, _y, _width, _height, color) {
-            return _super.call(this, canvas, _x, _y, _width, _height, color) || this;
+        function Field(context, canvas, _x, _y, _width, _height, color) {
+            return _super.call(this, context, canvas, _x, _y, _width, _height, color) || this;
         }
         return Field;
     }(rectangle_1.Rectangle));
@@ -87,8 +85,8 @@ define("circle", ["require", "exports", "shape"], function (require, exports, sh
     Object.defineProperty(exports, "__esModule", { value: true });
     var Circle = (function (_super) {
         __extends(Circle, _super);
-        function Circle(canvas, color, _x, _y, _width, _height, _radius) {
-            var _this = _super.call(this, canvas, _x, _y, _width, _height, color) || this;
+        function Circle(context, canvas, _x, _y, _width, _height, color, _radius) {
+            var _this = _super.call(this, context, canvas, _x, _y, _width, _height, color) || this;
             _this.radius = _radius;
             return _this;
         }
@@ -99,12 +97,11 @@ define("circle", ["require", "exports", "shape"], function (require, exports, sh
             enumerable: true,
             configurable: true
         });
-        Circle.prototype.draw = function () {
-            console.log('draw Object Circle');
-            this.context.beginPath();
-            this.context.fillStyle = this.color;
-            this.context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
-            this.context.fill();
+        Circle.prototype.draw = function (context) {
+            context.beginPath();
+            context.fillStyle = this.color;
+            context.arc(this._x, this._y, this._radius, 0, Math.PI * 2);
+            context.fill();
         };
         return Circle;
     }(shape_2.Shape));
@@ -115,13 +112,12 @@ define("object", ["require", "exports", "circle"], function (require, exports, c
     Object.defineProperty(exports, "__esModule", { value: true });
     var GameObject = (function (_super) {
         __extends(GameObject, _super);
-        function GameObject(canvas, color, _x, _y, _width, _height, _radius, acceleration) {
-            var _this = _super.call(this, canvas, color, _x, _y, _width, _height, _radius) || this;
+        function GameObject(context, canvas, _x, _y, _width, _height, color, _radius, acceleration) {
+            var _this = _super.call(this, context, canvas, _x, _y, _width, _height, color, _radius) || this;
             _this.acceleration = acceleration;
             return _this;
         }
         GameObject.prototype.move = function (coordX, coordY) {
-            console.log('moving');
             var xDistance = coordX - this.x;
             var yDistance = coordY - this.y;
             var distance = Math.sqrt(xDistance * xDistance + yDistance * yDistance);
@@ -139,8 +135,8 @@ define("dot", ["require", "exports", "circle"], function (require, exports, circ
     Object.defineProperty(exports, "__esModule", { value: true });
     var Dot = (function (_super) {
         __extends(Dot, _super);
-        function Dot(canvas, color, x, y, width, height, _radius) {
-            return _super.call(this, canvas, color, x, y, width, height, _radius) || this;
+        function Dot(context, canvas, _x, _y, _width, _height, color, _radius) {
+            return _super.call(this, context, canvas, _x, _y, _width, _height, color, _radius) || this;
         }
         return Dot;
     }(circle_2.Circle));
@@ -156,24 +152,25 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
     var MAX_ENEMY_NUMBER = 2;
     var SMALL_BALL_SIZE = 20 / 2000;
     var SMALL_BALL_RADIUS = 10 / 700;
-    var BACKGROUND_COLOR = '#ffffff';
-    var CONVERGENCE_RADIUS = 1 / 15;
+    var BACKGROUND_COLOR = '#eeeefe';
+    var CONVERGENCE_RADIUS = 5 / 15;
     var ENEMY_SIZE = 55 / 2000;
     var ENEMY_RADIUS = 30 / 700;
     var FIELD_COLOR = '#d7f4de';
     var FONT_COLOR = '#937cdd';
     var PLAYER_ACCELERATION = 0.09;
     var ENEMY_ACCELERATION = 0.01;
+    var LOW_ACCELERATION = 0.0045;
     var Game = (function () {
         function Game() {
             var _this = this;
-            this.canvas = document.getElementById("canvas");
-            this.context = this.canvas.getContext("2d");
             this.start = false;
             this.playerWin = true;
             this.numberOfGames = 0;
-            this.field = new field_1.Field(this.canvas, 0, 0, 1, 1, "red");
-            this.player = new object_1.GameObject(this.canvas, PLAYER_COLOR, 1 / 2, 1 / 2, PLAYER_SIZE, PLAYER_SIZE, PLAYER_RADIUS, PLAYER_ACCELERATION);
+            this.canvas = document.getElementById('canvas');
+            this.context = this.canvas.getContext("2d");
+            this.field = new field_1.Field(this.context, this.canvas, 0, 0, 1, 1, BACKGROUND_COLOR);
+            this.player = new object_1.GameObject(this.context, this.canvas, 1 / 2, 1 / 2, PLAYER_SIZE, PLAYER_SIZE, PLAYER_COLOR, PLAYER_RADIUS, PLAYER_ACCELERATION);
             this.player.x = this.field.width / 2;
             this.player.y = this.field.height / 2;
             this.enemies = [];
@@ -182,44 +179,38 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
             this._addEnemy();
             this.canvas.onclick = function (event) {
                 _this._startGame();
-                //   console.log('start');
             };
             this.canvas.addEventListener("mousemove", function (event) {
-                _this.player.move(event.offsetX / _this.canvas.clientWidth, event.offsetY / _this.canvas.clientHeight);
-                //  console.log('player moving');
+                _this.playerX = event.offsetX / _this.canvas.clientWidth;
+                _this.playerY = event.offsetY / _this.canvas.clientHeight;
             });
             window.addEventListener("resize", function () {
                 _this._resize();
-                //  console.log('resizeN');
             });
-            this._resize();
+            this._resize(this.canvas);
             requestAnimationFrame(this.onLoop.bind(this));
         }
         Game.prototype._getRandomCoordinates = function (min, max) {
-            //   console.log('getRandomCoordinates');
             return Math.random() * (max - min) + min;
         };
         Game.prototype._drawDot = function () {
             for (var i = 0; i != MAX_DOTS_NUMBER; i++) {
-                // console.log('drawDot');
-                this.dots[i].draw();
+                this.dots[i].draw(this.context);
             }
         };
         Game.prototype._addDot = function () {
             for (var i = 0; MAX_DOTS_NUMBER - this.dots.length > 0; i++) {
-                //   console.log('addDot');
-                this.dots.push(new dot_1.Dot(this.canvas, this._getRandomColor(), this._getRandomCoordinates(0, 1), this._getRandomCoordinates(0, 1), SMALL_BALL_SIZE, SMALL_BALL_SIZE, SMALL_BALL_RADIUS));
+                this.dots.push(new dot_1.Dot(this.context, this.canvas, this._getRandomCoordinates(0, 1), this._getRandomCoordinates(0, 1), SMALL_BALL_SIZE, SMALL_BALL_SIZE, this._getRandomColor(), SMALL_BALL_RADIUS));
             }
         };
         Game.prototype._addEnemy = function () {
             for (var i = 0; MAX_DOTS_NUMBER - this.enemies.length > 0; i++) {
-                this.enemies.push(new object_1.GameObject(this.canvas, this._getRandomColor(), this._getRandomCoordinates(0, 1), this._getRandomCoordinates(0, 1), ENEMY_SIZE, ENEMY_SIZE, ENEMY_RADIUS, ENEMY_ACCELERATION));
+                this.enemies.push(new object_1.GameObject(this.context, this.canvas, this._getRandomCoordinates(0, 1), this._getRandomCoordinates(0, 1), ENEMY_SIZE, ENEMY_SIZE, this._getRandomColor(), ENEMY_RADIUS, ENEMY_ACCELERATION));
             }
         };
         Game.prototype._drawEnemies = function () {
             for (var j = 0; j != MAX_ENEMY_NUMBER; j++) {
-                this.enemies[j].draw();
-                //    console.log('enemy draw');
+                this.enemies[j].draw(this.context);
             }
         };
         Game.prototype._getRandomColor = function () {
@@ -246,7 +237,6 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
         };
         Game.prototype._enemiesMove = function () {
             if (this.start) {
-                console.log('enemy moving');
                 for (var j = 0; j != MAX_ENEMY_NUMBER; j++) {
                     var i = this._getRandomInt(0, this.dots.length);
                     if (this._radiusVisibility(this.player, this.enemies[j], CONVERGENCE_RADIUS)) {
@@ -268,6 +258,7 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
                 }
                 else if (this._canEat(this.player, this.enemies[j]) == true) {
                     this.enemies.splice(j, 1);
+                    this.numberEatenEnemies++;
                     this._addEnemy();
                 }
                 else
@@ -305,7 +296,9 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
                 predator.width = predator.width + victim.width * victim.width;
                 predator.height = predator.height + victim.height * victim.width;
                 predator.radius = predator.radius + victim.radius * victim.width;
-                predator.acceleration = predator.acceleration - predator.acceleration * victim.width;
+                if (predator.acceleration < LOW_ACCELERATION) {
+                    predator.acceleration = predator.acceleration - predator.acceleration * victim.width;
+                }
                 return true;
             }
         };
@@ -356,6 +349,17 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
         Game.prototype._endGame = function () {
             this.start = false;
             this.numberOfGames++;
+            this._restart();
+        };
+        Game.prototype._restart = function () {
+            delete this.player;
+            this.player = new object_1.GameObject(this.context, this.canvas, 1 / 2, 1 / 2, PLAYER_SIZE, PLAYER_SIZE, PLAYER_COLOR, PLAYER_RADIUS, PLAYER_ACCELERATION);
+            this.player.x = this.field.width / 2;
+            this.player.y = this.field.height / 2;
+            this.enemies = [];
+            this.dots = [];
+            this._addDot();
+            this._addEnemy();
         };
         Game.prototype._drawWallpaper = function () {
             this.context.fillStyle = FIELD_COLOR;
@@ -372,15 +376,16 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
             }
         };
         Game.prototype._update = function () {
+            this.player.move(this.playerX, this.playerY);
             this._enemiesMove();
             this._processCollisions();
         };
         Game.prototype._draw = function () {
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            this.field.draw(this.canvas.width, this.canvas.height);
+            this.field.draw(this.context);
             this._drawDot();
             this._drawEnemies();
-            this.player.draw();
+            this.player.draw(this.context);
             if (!this.start) {
                 this._drawWallpaper();
             }
@@ -393,4 +398,15 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
         return Game;
     }());
     var game = new Game();
+});
+define("prob", ["require", "exports", "rectangle"], function (require, exports, rectangle_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var canvas;
+    var context;
+    canvas = document.getElementById('canvas');
+    context = canvas.getContext("2d");
+    var rec = new rectangle_2.Rectangle(context, canvas, 0, 0, 1, 1, "red");
+    console.log(canvas.width);
+    rec.draw(context);
 });
