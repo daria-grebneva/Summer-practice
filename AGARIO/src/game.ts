@@ -3,22 +3,22 @@ import {GameObject} from "./object";
 import {Dot} from "./dot";
 import {Circle} from "./circle";
 
-const PLAYER_SIZE = 50 / 2000;
-const PLAYER_RADIUS = 25 / 700;
+const PLAYER_SIZE = 20 / 2000;
+const PLAYER_RADIUS = 10 / 700;
 const PLAYER_COLOR = '#183c3d';
 
-const MAX_DOTS_NUMBER = 5;
-const MAX_ENEMY_NUMBER = 2;
+const MAX_DOTS_NUMBER = 40;
+const MAX_ENEMY_NUMBER = 6;
 
-const SMALL_BALL_SIZE = 20 / 2000;
-const SMALL_BALL_RADIUS = 10 / 700;
+const SMALL_BALL_SIZE = 8 / 2000;
+const SMALL_BALL_RADIUS = 4 / 700;
 
 const BACKGROUND_COLOR = '#eeeefe';
 
 const CONVERGENCE_RADIUS = 5 / 15;
 
-const ENEMY_SIZE = 55 / 2000;
-const ENEMY_RADIUS = 30 / 700;
+const ENEMY_SIZE = 22 / 2000;
+const ENEMY_RADIUS = 12 / 700;
 
 const FIELD_COLOR = '#d7f4de';
 const FONT_COLOR = '#937cdd';
@@ -26,6 +26,10 @@ const FONT_COLOR = '#937cdd';
 const PLAYER_ACCELERATION = 0.09;
 const ENEMY_ACCELERATION = 0.01;
 const LOW_ACCELERATION = 0.0045;
+
+const CANVAS_SCALE = 40;
+const X_REVIEW = 3800;
+const Y_REVIEW = 1840;
 
 interface IGame {
     canvas: any;
@@ -132,8 +136,8 @@ class Game implements IGame {
 
     _resize() {
         let canvas = this.canvas;
-        const width = canvas.scrollWidth;
-        const height = canvas.scrollHeight;
+        const width = canvas.clientWidth;
+        const height = canvas.clientHeight;
         if (canvas.width !== width || canvas.height !== height) {
             canvas.width = width;
             canvas.height = height;
@@ -291,13 +295,19 @@ class Game implements IGame {
         this.context.fillRect(0, 0, this.canvas.scrollWidth, this.canvas.scrollHeight);
         this.context.fillStyle = FONT_COLOR;
         this.context.font = this.canvas.height * 1 / 7 + 'px slabo';
-        this.context.fillText('AGARIO', this.canvas.width * 1 / 10, this.canvas.height * 2 / 10);
+        this.context.fillText('AGARIO', this.canvas.width * 3 / 10, this.canvas.height * 4 / 10);
         this.context.font = this.canvas.height * 1 / 9 + 'px slabo';
-        this.context.fillText('Click to continue', this.canvas.width * 1 / 10, this.canvas.height * 3 / 10);
+        this.context.fillText('Click to continue', this.canvas.width * 3 / 10, this.canvas.height * 5 / 10);
         if (this.numberOfGames > 0) {
             this.context.font = this.canvas.height * 1 / 9 + 'px slabo';
-            this.context.fillText('You ate', this.canvas.width * 1 / 10, this.canvas.height * 4 / 10);
+            this.context.fillText('You ate', this.canvas.width * 3 / 10, this.canvas.height * 6 / 10);
         }
+    }
+
+    _gameCameraCoordinates() {
+        let cameraX = Math.round((this.canvas.width / CANVAS_SCALE - this.player._x - this.player._width / 2));
+        let cameraY = Math.round((this.canvas.height / CANVAS_SCALE - this.player._y - this.player._height / 2));
+        return {x: cameraX, y: cameraY}
     }
 
     _update() {
@@ -307,7 +317,9 @@ class Game implements IGame {
     }
 
     _draw() {
+        this.context.setTransform(1, 0, 0, 1, 0, 0);
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.context.setTransform(X_REVIEW / this.canvas.width, 0, 0, Y_REVIEW / this.canvas.height, this._gameCameraCoordinates().x, this._gameCameraCoordinates().y);
         this.field.draw(this.context);
         this._drawDot();
         this._drawEnemies();
