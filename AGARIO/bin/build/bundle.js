@@ -164,6 +164,7 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
     var CANVAS_SCALE = 40;
     var X_REVIEW = 3800;
     var Y_REVIEW = 1840;
+    var RESIZE_COEF = 0.505;
     var Game = (function () {
         function Game() {
             var _this = this;
@@ -234,6 +235,9 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
             if (canvas.width !== width || canvas.height !== height) {
                 canvas.width = width;
                 canvas.height = height;
+                X_REVIEW = width / RESIZE_COEF;
+                Y_REVIEW = height / RESIZE_COEF;
+                console.log('Ширина: ', canvas.clientWidth, 'Высота: ', canvas.clientHeight);
                 return true;
             }
             return false;
@@ -408,177 +412,4 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
         return Game;
     }());
     var game = new Game();
-});
-define("camera", ["require", "exports", "rectangle"], function (require, exports, rectangle_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Camera = (function (_super) {
-        __extends(Camera, _super);
-        function Camera(context, canvas, _x, _y, canvasWidth, canvasHeight, _width, _height, color) {
-            var _this = _super.call(this, context, canvas, _x, _y, _width, _height, color) || this;
-            _this.canvasWidth = canvasWidth;
-            _this.canvasHeight = canvasHeight;
-            _this.xDeadZone = 0;
-            _this.yDeadZone = 0;
-            _this.widthView = 0.3;
-            _this.heightView = 0.3;
-            _this.viewportRect = new rectangle_2.Rectangle(context, canvas, _this.x, _this.y, _this.widthView, _this.heightView, color);
-            _this.worldRect = new rectangle_2.Rectangle(context, canvas, 0, 0, _this._width, _this._height, color);
-            _this.followed = null;
-            _this.axis = 3 /* Both */;
-            return _this;
-        }
-        Camera.prototype.follow = function (gameObject, xDeadZone, yDeadZone) {
-            this.followed = gameObject;
-            this.xDeadZone = xDeadZone;
-            this.yDeadZone = yDeadZone;
-            // console.log(1);
-        };
-        Camera.prototype.update = function () {
-            // keep following the player (or other desired object)
-            if (this.followed != null) {
-                if (this.axis == 1 /* Horizontal */ || this.axis == 3 /* Both */) {
-                    // moves camera on horizontal axis based on followed object position
-                    if (this.followed.x - this.x + this.xDeadZone > this.widthView)
-                        this.x = this.followed.x - (this.widthView - this.xDeadZone);
-                    else if (this.followed.x - this.xDeadZone < this.x)
-                        this.x = this.followed.x - this.xDeadZone;
-                }
-                if (this.axis == 2 /* Vertical */ || this.axis == 3 /* Both */) {
-                    // moves camera on vertical axis based on followed object position
-                    if (this.followed.y - this.y + this.yDeadZone > this.heightView)
-                        this.y = this.followed.y - (this.heightView - this.yDeadZone);
-                    else if (this.followed.y - this.yDeadZone < this.y)
-                        this.y = this.followed.y - this.yDeadZone;
-                }
-            }
-            // update viewportRect
-            // this.viewportRect.set(this.x, this.y);
-            // don't let camera leaves the world's boundary
-            /*        if (!this.viewportRect._within(this.worldRect)) {
-             if (this.viewportRect.x < this.worldRect.x)
-             this.x = this.worldRect.left;
-             if (this.viewportRect.y < this.worldRect.y)
-             this.y = this.worldRect.y;
-             if (this.viewportRect.x + this.viewportRect.width > this.worldRect.x + this.worldRect.width)
-             this.x = this.worldRect.x + this.worldRect.width - this.widthView;
-             if (this.viewportRect.y + this.viewportRect.height > this.worldRect.y + this.worldRect.height)
-             this.y = this.worldRect.y + this.worldRect.height - this.heightView;
-             }*/
-        };
-        return Camera;
-    }(rectangle_2.Rectangle));
-    exports.Camera = Camera;
-});
-define("prob", ["require", "exports", "field", "object", "camera"], function (require, exports, field_2, object_2, camera_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var PLAYER_SIZE = 50 / 2000;
-    var PLAYER_RADIUS = 25 / 700;
-    var PLAYER_COLOR = '#183c3d';
-    var MAX_DOTS_NUMBER = 5;
-    var MAX_ENEMY_NUMBER = 2;
-    var SMALL_BALL_SIZE = 20 / 2000;
-    var SMALL_BALL_RADIUS = 10 / 700;
-    var BACKGROUND_COLOR = '#eeeefe';
-    var CONVERGENCE_RADIUS = 5 / 15;
-    var ENEMY_SIZE = 55 / 2000;
-    var ENEMY_RADIUS = 30 / 700;
-    var FIELD_COLOR = '#d7f4de';
-    var FONT_COLOR = '#937cdd';
-    var PLAYER_ACCELERATION = 0.09;
-    var ENEMY_ACCELERATION = 0.01;
-    var LOW_ACCELERATION = 0.0045;
-    var Game = (function () {
-        function Game() {
-            var _this = this;
-            this.start = false;
-            this.canvas = document.getElementById('canvas');
-            this.context = this.canvas.getContext("2d");
-            this.field = new field_2.Field(this.context, this.canvas, 0, 0, 1, 1, BACKGROUND_COLOR);
-            this.player = new object_2.GameObject(this.context, this.canvas, 1 / 2, 1 / 2, PLAYER_SIZE, PLAYER_SIZE, PLAYER_COLOR, PLAYER_RADIUS, PLAYER_ACCELERATION);
-            this.player.x = this.canvas.width / 2;
-            this.player.y = this.canvas.height / 2;
-            this.camera = new camera_1.Camera(this.context, this.canvas, 0, 0, this.canvas.width, this.canvas.height, 0.3, 0.3, "red");
-            this.camera.follow(this.player, this.canvas.width / 2, this.canvas.height / 2);
-            this.canvas.onclick = function (event) {
-                _this._startGame();
-            };
-            this.canvas.addEventListener("mousemove", function (event) {
-                _this.playerX = event.offsetX / _this.canvas.clientWidth;
-                _this.playerY = event.offsetY / _this.canvas.clientHeight;
-            });
-            window.addEventListener("resize", function () {
-                _this._resize();
-            });
-            this._resize(this.canvas);
-            requestAnimationFrame(this.onLoop.bind(this));
-        }
-        Game.prototype._resize = function () {
-            var canvas = this.canvas;
-            var width = canvas.clientWidth;
-            var height = canvas.clientHeight;
-            if (canvas.width !== width || canvas.height !== height) {
-                canvas.width = width;
-                canvas.height = height;
-                return true;
-            }
-            return false;
-        };
-        Game.prototype._startGame = function () {
-            if (!this.start) {
-                this.start = true;
-            }
-        };
-        Game.prototype._drawWallpaper = function () {
-            this.context.fillStyle = FIELD_COLOR;
-            this.context.globalAlpha = 1;
-            this.context.fillRect(0, 0, this.canvas.scrollWidth, this.canvas.scrollHeight);
-            this.context.fillStyle = FONT_COLOR;
-            this.context.font = this.canvas.height * 1 / 7 + 'px slabo';
-            this.context.fillText('AGARIO', this.canvas.width * 1 / 10, this.canvas.height * 2 / 10);
-            this.context.font = this.canvas.height * 1 / 9 + 'px slabo';
-            this.context.fillText('Click to continue', this.canvas.width * 1 / 10, this.canvas.height * 3 / 10);
-            if (this.numberOfGames > 0) {
-                this.context.font = this.canvas.height * 1 / 9 + 'px slabo';
-                this.context.fillText('You ate', this.canvas.width * 1 / 10, this.canvas.height * 4 / 10);
-            }
-        };
-        Game.prototype._update = function () {
-            this.player.move(this.playerX, this.playerY);
-            this.camera.update();
-        };
-        Game.prototype._drawImage = function (sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight) {
-            sWidth = this.canvas.width;
-            sHeight = this.canvas.height;
-            if (this.canvas.width - sx < sWidth) {
-                sWidth = this.canvas.width - sx;
-            }
-            if (this.canvas.height - sy < sHeight) {
-                sHeight = this.canvas.height - sy;
-            }
-            dx = 0;
-            dy = 0;
-            dWidth = sWidth;
-            dHeight = sHeight;
-            this.context.fillStyle = "blue";
-            this.context.fillRect(sx, sy, sWidth, sHeight);
-        };
-        Game.prototype._draw = function () {
-            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            //this.field.draw(this.context);
-            this._drawImage(0, 0, 30, 30, 0, 0, 30, 30);
-            this.camera.draw(this.context);
-            this.player.draw(this.context);
-            if (!this.start) {
-                this._drawWallpaper();
-            }
-        };
-        Game.prototype.onLoop = function () {
-            this._update();
-            this._draw();
-            requestAnimationFrame(this.onLoop.bind(this));
-        };
-        return Game;
-    }());
 });

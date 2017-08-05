@@ -28,8 +28,11 @@ const ENEMY_ACCELERATION = 0.01;
 const LOW_ACCELERATION = 0.0045;
 
 const CANVAS_SCALE = 40;
-const X_REVIEW = 3800;
-const Y_REVIEW = 1840;
+let X_REVIEW = 3800;
+let Y_REVIEW = 1840;
+
+const RESIZE_COEF = 0.505;
+
 
 interface IGame {
     canvas: any;
@@ -141,6 +144,8 @@ class Game implements IGame {
         if (canvas.width !== width || canvas.height !== height) {
             canvas.width = width;
             canvas.height = height;
+            X_REVIEW = width / RESIZE_COEF;
+            Y_REVIEW = height / RESIZE_COEF;
             return true;
         }
         return false;
