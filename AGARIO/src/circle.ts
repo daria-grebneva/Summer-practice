@@ -18,7 +18,7 @@ export class Circle extends Shape implements ICircle {
     public draw(context: CanvasRenderingContext2D): void {
         context.beginPath();
         context.fillStyle = this.color;
-        context.arc(this._x, this._y, this._radius, 0, Math.PI * 2);
+        context.arc(this.x * this.canvas.width, this.y * this.canvas.height, this._radius, 0, Math.PI * 2);
         context.fill();
     }
 }

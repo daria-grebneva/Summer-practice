@@ -100,7 +100,7 @@ define("circle", ["require", "exports", "shape"], function (require, exports, sh
         Circle.prototype.draw = function (context) {
             context.beginPath();
             context.fillStyle = this.color;
-            context.arc(this._x, this._y, this._radius, 0, Math.PI * 2);
+            context.arc(this.x * this.canvas.width, this.y * this.canvas.height, this._radius, 0, Math.PI * 2);
             context.fill();
         };
         return Circle;
@@ -120,7 +120,7 @@ define("object", ["require", "exports", "circle"], function (require, exports, c
         GameObject.prototype.move = function (coordX, coordY) {
             var xDistance = coordX - this.x;
             var yDistance = coordY - this.y;
-            var distance = Math.sqrt(xDistance * xDistance + yDistance * yDistance);
+            var distance = Math.hypot(xDistance, yDistance);
             if (distance > 0) {
                 this.x += xDistance * this.acceleration;
                 this.y += yDistance * this.acceleration;
@@ -166,6 +166,44 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
     var Y_REVIEW = 1840;
     var RESIZE_COEF = 0.505;
     var socket = io();
+    /*const movement = {
+     up: false,
+     down: false,
+     left: false,
+     right: false
+     };
+     document.addEventListener('keydown', (event) => {
+     switch (event.keyCode) {
+     case 65: // A
+     movement.left = true;
+     break;
+     case 87: // W
+     movement.up = true;
+     break;
+     case 68: // D
+     movement.right = true;
+     break;
+     case 83: // S
+     movement.down = true;
+     break;
+     }
+     });
+     document.addEventListener('keyup', (event) => {
+     switch (event.keyCode) {
+     case 65: // A
+     movement.left = false;
+     break;
+     case 87: // W
+     movement.up = false;
+     break;
+     case 68: // D
+     movement.right = false;
+     break;
+     case 83: // S
+     movement.down = false;
+     break;
+     }
+     });*/
     var Game = (function () {
         function Game() {
             var _this = this;
@@ -177,20 +215,38 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
             this.field = new field_1.Field(this.context, this.canvas, 0, 0, 1, 1, BACKGROUND_COLOR);
             this.player = null;
             this.dots = [];
+            this._addDot();
+            var movement = {
+                x: 0,
+                y: 0,
+                acceleration: 0,
+            };
+            document.addEventListener("mousemove", function (event) {
+                movement.x = (event.offsetX / _this.canvas.clientWidth);
+                movement.y = (event.offsetY / _this.canvas.clientHeight);
+            });
             socket.emit('new player');
             socket.on('state', function (players) {
-                for (var i = 0; i != 2; i++) {
-                    players.push(new object_1.GameObject(_this.context, _this.canvas, 1 / 2, 1 / 2, PLAYER_SIZE, PLAYER_SIZE, PLAYER_COLOR, PLAYER_RADIUS, PLAYER_ACCELERATION));
-                    _this.player = players[i];
-                    console.log(1);
+                _this.context.clearRect(0, 0, _this.canvas.width, _this.canvas.height);
+                _this.field.draw(_this.context);
+                _this._drawDot();
+                for (var id in players) {
+                    _this.player = players[id];
+                    _this.player = new object_1.GameObject(_this.context, _this.canvas, _this.player.x, _this.player.y, PLAYER_SIZE, PLAYER_SIZE, PLAYER_COLOR, PLAYER_RADIUS, PLAYER_ACCELERATION);
+                    movement.acceleration = PLAYER_ACCELERATION;
+                    _this.player.draw(_this.context);
                 }
             });
-            socket.on('state', function (dots) {
-                for (var i = 0; MAX_DOTS_NUMBER - _this.dots.length > 0; i++) {
-                    dots.push(new dot_1.Dot(_this.context, _this.canvas, _this._getRandomCoordinates(0, 1), _this._getRandomCoordinates(0, 1), SMALL_BALL_SIZE, SMALL_BALL_SIZE, _this._getRandomColor(), SMALL_BALL_RADIUS));
-                    _this.dots[i] = dots[i];
-                }
-            });
+            socket.emit('disconnect');
+            setInterval(function () {
+                socket.emit('movement', movement);
+            }, 1000 / 60);
+            /*      socket.on('state', (dots) => {
+             /!*  for (let i = 0; MAX_DOTS_NUMBER - this.dots.length > 0; i++) {
+             dots.push(new Dot(this.context, this.canvas, this._getRandomCoordinates(0, 1), this._getRandomCoordinates(0, 1), SMALL_BALL_SIZE, SMALL_BALL_SIZE, this._getRandomColor(), SMALL_BALL_RADIUS));
+             this.dots[i] = dots[i];
+             }*!/
+             });*/
             window.addEventListener("resize", function () {
                 _this._resize();
             });
@@ -208,27 +264,24 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
             }
             return colorNum;
         };
+        Game.prototype._addDot = function () {
+            for (var i = 0; MAX_DOTS_NUMBER - this.dots.length > 0; i++) {
+                this.dots.push(new dot_1.Dot(this.context, this.canvas, this._getRandomCoordinates(0, 1), this._getRandomCoordinates(0, 1), SMALL_BALL_SIZE, SMALL_BALL_SIZE, this._getRandomColor(), SMALL_BALL_RADIUS));
+            }
+        };
         Game.prototype._drawDot = function () {
             for (var i = 0; i != MAX_DOTS_NUMBER; i++) {
                 this.dots[i].draw(this.context);
             }
         };
         Game.prototype._update = function () {
-            var _this = this;
-            document.addEventListener("mousemove", function (event) {
-                _this.playerX = event.offsetX / _this.canvas.clientWidth;
-                _this.playerY = event.offsetY / _this.canvas.clientHeight;
-            });
-            socket.emit('movement', this.player.move(this.playerX, this.playerY));
         };
         Game.prototype._draw = function () {
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
             this.field.draw(this.context);
-            this.player.draw(this.context);
-            this._drawDot();
         };
         Game.prototype.onLoop = function () {
-            if (this.player) {
+            if (!this.player) {
                 this._update();
                 this._draw();
             }

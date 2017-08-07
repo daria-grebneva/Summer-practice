@@ -1,5 +1,6 @@
 import {Field} from "./field";
 import {GameObject} from "./object";
+import {Shape} from "./shape";
 import {Dot} from "./dot";
 import {Circle} from "./circle";
 const PLAYER_SIZE = 20 / 2000;
@@ -75,24 +76,32 @@ class Game implements IGame {
         this.field = new Field(this.context, this.canvas, 0, 0, 1, 1, BACKGROUND_COLOR);
         this.player = null;
         this.dots = [];
-
+        this._addDot()
+        let movement = {
+            x: 0,
+            y: 0,
+            acceleration: 0,
+        };
+        document.addEventListener("mousemove", (event) => {
+            movement.x = (event.offsetX / this.canvas.clientWidth);
+            movement.y = (event.offsetY / this.canvas.clientHeight);
+        });
         socket.emit('new player');
-
         socket.on('state', (players) => {
-            for (let i = 0; i != 2; i++) {
-                players.push(new GameObject(this.context, this.canvas, 1 / 2, 1 / 2, PLAYER_SIZE, PLAYER_SIZE, PLAYER_COLOR, PLAYER_RADIUS, PLAYER_ACCELERATION));
-                this.player = players[i];
-
-                console.log(1);
+            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.field.draw(this.context);
+            this._drawDot();
+            for (let id in players) {
+                this.player = players[id];
+                this.player = new GameObject(this.context, this.canvas, this.player.x, this.player.y, PLAYER_SIZE, PLAYER_SIZE, PLAYER_COLOR, PLAYER_RADIUS, PLAYER_ACCELERATION);
+                movement.acceleration = PLAYER_ACCELERATION;
+                this.player.draw(this.context);
             }
         });
-
-        socket.on('state', (dots) => {
-            for (let i = 0; MAX_DOTS_NUMBER - this.dots.length > 0; i++) {
-                dots.push(new Dot(this.context, this.canvas, this._getRandomCoordinates(0, 1), this._getRandomCoordinates(0, 1), SMALL_BALL_SIZE, SMALL_BALL_SIZE, this._getRandomColor(), SMALL_BALL_RADIUS));
-                this.dots[i] = dots[i];
-            }
-        });
+        socket.emit('disconnect');
+        setInterval(() => {
+            socket.emit('movement', movement);
+        }, 1000 / 60);
         window.addEventListener("resize", () => {
             this._resize();
         });
@@ -113,6 +122,12 @@ class Game implements IGame {
         return colorNum;
     }
 
+    _addDot() {
+        for (let i = 0; MAX_DOTS_NUMBER - this.dots.length > 0; i++) {
+            this.dots.push(new Dot(this.context, this.canvas, this._getRandomCoordinates(0, 1), this._getRandomCoordinates(0, 1), SMALL_BALL_SIZE, SMALL_BALL_SIZE, this._getRandomColor(), SMALL_BALL_RADIUS));
+        }
+    }
+
     _drawDot() {
         for (let i = 0; i != MAX_DOTS_NUMBER; i++) {
             this.dots[i].draw(this.context);
@@ -120,22 +135,15 @@ class Game implements IGame {
     }
 
     _update() {
-        document.addEventListener("mousemove", (event) => {
-            this.playerX = event.offsetX / this.canvas.clientWidth;
-            this.playerY = event.offsetY / this.canvas.clientHeight;
-        });
-        socket.emit('movement', this.player.move(this.playerX, this.playerY))
     }
 
     _draw() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.field.draw(this.context);
-        this.player.draw(this.context);
-        this._drawDot();
     }
 
     onLoop() {
-        if (this.player) {
+        if (!this.player) {
             this._update();
             this._draw();
         }
