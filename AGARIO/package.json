@@ -13,6 +13,9 @@
   "author": "Daria Grebneva <email>",
   "license": "MIT",
   "dependencies": {
+    "body-parser": "^1.16.0",
+    "express": "^4.15.3",
+    "socket.io": "^2.0.3",
     "typescript": "^2.4.2"
   }
 }

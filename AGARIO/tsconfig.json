@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "amd",
     "target": "es5",
-    "outFile": "./bin/build/bundle.js"
+    "outFile": "./static/bin/build/bundle.js"
   },
   "files": [
     "./src/game.ts"
