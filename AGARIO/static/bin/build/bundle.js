@@ -120,10 +120,10 @@ define("object", ["require", "exports", "circle"], function (require, exports, c
         GameObject.prototype.move = function (coordX, coordY) {
             var xDistance = coordX - this.x;
             var yDistance = coordY - this.y;
-            var distance = Math.hypot(xDistance, yDistance);
+            var distance = Math.sqrt(xDistance * xDistance + yDistance * yDistance);
             if (distance > 0) {
-                this.x += xDistance * this.acceleration;
-                this.y += yDistance * this.acceleration;
+                this.x += xDistance * this.acceleration /* / this.canvas.width*/;
+                this.y += yDistance * this.acceleration /*/ this.canvas.height*/;
             }
         };
         return GameObject;
@@ -148,7 +148,6 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
     var PLAYER_SIZE = 20 / 2000;
     var PLAYER_RADIUS = 10 / 700;
     var PLAYER_COLOR = '#183c3d';
-    var MAX_DOTS_NUMBER = 40;
     var MAX_ENEMY_NUMBER = 6;
     var SMALL_BALL_SIZE = 8 / 2000;
     var SMALL_BALL_RADIUS = 4 / 700;
@@ -158,7 +157,7 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
     var ENEMY_RADIUS = 12 / 700;
     var FIELD_COLOR = '#d7f4de';
     var FONT_COLOR = '#937cdd';
-    var PLAYER_ACCELERATION = 0.09;
+    var PLAYER_ACCELERATION = 0.2;
     var ENEMY_ACCELERATION = 0.01;
     var LOW_ACCELERATION = 0.0045;
     var CANVAS_SCALE = 40;
@@ -166,124 +165,72 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
     var Y_REVIEW = 1840;
     var RESIZE_COEF = 0.505;
     var socket = io();
-    /*const movement = {
-     up: false,
-     down: false,
-     left: false,
-     right: false
-     };
-     document.addEventListener('keydown', (event) => {
-     switch (event.keyCode) {
-     case 65: // A
-     movement.left = true;
-     break;
-     case 87: // W
-     movement.up = true;
-     break;
-     case 68: // D
-     movement.right = true;
-     break;
-     case 83: // S
-     movement.down = true;
-     break;
-     }
-     });
-     document.addEventListener('keyup', (event) => {
-     switch (event.keyCode) {
-     case 65: // A
-     movement.left = false;
-     break;
-     case 87: // W
-     movement.up = false;
-     break;
-     case 68: // D
-     movement.right = false;
-     break;
-     case 83: // S
-     movement.down = false;
-     break;
-     }
-     });*/
     var Game = (function () {
         function Game() {
             var _this = this;
+            this.state = {
+                players: null,
+                id: 0,
+                dots: null,
+                dots_length: 0,
+            };
+            this.movement = {
+                x: 0,
+                y: 0,
+                acceleration: 0,
+            };
             this.start = false;
             this.playerWin = true;
             this.numberOfGames = 0;
             this.canvas = document.getElementById('canvas');
             this.context = this.canvas.getContext("2d");
             this.field = new field_1.Field(this.context, this.canvas, 0, 0, 1, 1, BACKGROUND_COLOR);
-            this.player = null;
             this.dots = [];
-            this._addDot();
-            var movement = {
-                x: 0,
-                y: 0,
-                acceleration: 0,
-            };
             document.addEventListener("mousemove", function (event) {
-                movement.x = (event.offsetX / _this.canvas.clientWidth);
-                movement.y = (event.offsetY / _this.canvas.clientHeight);
+                _this.movement.x = (event.offsetX / _this.canvas.clientWidth);
+                _this.movement.y = (event.offsetY / _this.canvas.clientHeight);
             });
             socket.emit('new player');
-            socket.on('state', function (players) {
-                _this.context.clearRect(0, 0, _this.canvas.width, _this.canvas.height);
-                _this.field.draw(_this.context);
-                _this._drawDot();
-                for (var id in players) {
-                    _this.player = players[id];
-                    _this.player = new object_1.GameObject(_this.context, _this.canvas, _this.player.x, _this.player.y, PLAYER_SIZE, PLAYER_SIZE, PLAYER_COLOR, PLAYER_RADIUS, PLAYER_ACCELERATION);
-                    movement.acceleration = PLAYER_ACCELERATION;
-                    _this.player.draw(_this.context);
-                }
+            socket.on("player_created", function () {
+                socket.on('state', function (state) {
+                    _this.state.players = state.players;
+                    _this.state.dots = state.dots;
+                    _this.state.dots_length = state.dots.length;
+                });
             });
             socket.emit('disconnect');
-            setInterval(function () {
-                socket.emit('movement', movement);
-            }, 1000 / 60);
-            /*      socket.on('state', (dots) => {
-             /!*  for (let i = 0; MAX_DOTS_NUMBER - this.dots.length > 0; i++) {
-             dots.push(new Dot(this.context, this.canvas, this._getRandomCoordinates(0, 1), this._getRandomCoordinates(0, 1), SMALL_BALL_SIZE, SMALL_BALL_SIZE, this._getRandomColor(), SMALL_BALL_RADIUS));
-             this.dots[i] = dots[i];
-             }*!/
-             });*/
             window.addEventListener("resize", function () {
                 _this._resize();
             });
             this._resize(this.canvas);
             requestAnimationFrame(this.onLoop.bind(this));
         }
-        Game.prototype._getRandomCoordinates = function (min, max) {
-            return Math.random() * (max - min) + min;
-        };
-        Game.prototype._getRandomColor = function () {
-            var letters = '0123456789ABCDEF';
-            var colorNum = '#';
-            for (var i = 0; i < 6; i++) {
-                colorNum += letters[Math.floor(Math.random() * 16)];
-            }
-            return colorNum;
-        };
-        Game.prototype._addDot = function () {
-            for (var i = 0; MAX_DOTS_NUMBER - this.dots.length > 0; i++) {
-                this.dots.push(new dot_1.Dot(this.context, this.canvas, this._getRandomCoordinates(0, 1), this._getRandomCoordinates(0, 1), SMALL_BALL_SIZE, SMALL_BALL_SIZE, this._getRandomColor(), SMALL_BALL_RADIUS));
-            }
-        };
-        Game.prototype._drawDot = function () {
-            for (var i = 0; i != MAX_DOTS_NUMBER; i++) {
-                this.dots[i].draw(this.context);
-            }
-        };
         Game.prototype._update = function () {
+            socket.emit('movement', this.movement);
         };
         Game.prototype._draw = function () {
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
             this.field.draw(this.context);
+            this._drawDots();
+        };
+        Game.prototype._drawPlayer = function () {
+            this.player.draw(this.context);
+        };
+        Game.prototype._drawDots = function () {
+            for (var i = 0; i < this.state.dots_length; i++) {
+                var dot = this.state.dots[i];
+                dot = new dot_1.Dot(this.context, this.canvas, dot.x, dot.y, SMALL_BALL_SIZE, SMALL_BALL_SIZE, dot.color, SMALL_BALL_RADIUS);
+                dot.draw(this.context);
+            }
         };
         Game.prototype.onLoop = function () {
-            if (!this.player) {
-                this._update();
+            for (var id in this.state.players) {
+                this.player = this.state.players[id];
+                this.player = new object_1.GameObject(this.context, this.canvas, this.player.x, this.player.y, PLAYER_SIZE, PLAYER_SIZE, PLAYER_COLOR, PLAYER_RADIUS, PLAYER_ACCELERATION);
+                this.movement.acceleration = this.player.acceleration;
                 this._draw();
+                this._update();
+                this._drawPlayer();
             }
             requestAnimationFrame(this.onLoop.bind(this));
         };
