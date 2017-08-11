@@ -56,9 +56,12 @@ function move(coordX, coordY, acceleration, obj) {
   }
 }
 
+
 let state = {
   "players": {},
   "dots": initDotsPositions(),
+  "canvas_width": null,
+  "canvas_height": null,
 };
 
 io.on('connection', function (socket) {
@@ -78,8 +81,12 @@ io.on('connection', function (socket) {
   socket.on('movement', function (data) {
     let player = state.players[socket.id] || {};
     move(data.x, data.y, data.acceleration, player);
+    state.canvas_width = data.canvasWidth;
+    state.canvas_height = data.canvasHeight;
     //TODO:: check collisions!
   });
+
+
 
 });
 setInterval(function () {

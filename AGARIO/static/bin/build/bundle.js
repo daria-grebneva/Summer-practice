@@ -178,6 +178,8 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
                 x: 0,
                 y: 0,
                 acceleration: 0,
+                canvasWidth: 0,
+                canvasHeight: 0,
             };
             this.start = false;
             this.playerWin = true;
@@ -207,8 +209,10 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
         }
         Game.prototype._update = function () {
             socket.emit('movement', this.movement);
+            // this.context.setTransform(X_REVIEW / this.canvas.width, 0, 0, Y_REVIEW / this.canvas.height, this._gameCameraCoordinates().x, this._gameCameraCoordinates().y);
         };
         Game.prototype._draw = function () {
+            this.context.setTransform(1, 0, 0, 1, 0, 0);
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
             this.field.draw(this.context);
             this._drawDots();
@@ -223,12 +227,18 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
                 dot.draw(this.context);
             }
         };
+        Game.prototype._gameCameraCoordinates = function () {
+            var cameraX = Math.round((this.canvas.width / CANVAS_SCALE - this.player._x - this.player._width / 2));
+            var cameraY = Math.round((this.canvas.height / CANVAS_SCALE - this.player._y - this.player._height / 2));
+            return { x: cameraX, y: cameraY };
+        };
         Game.prototype.onLoop = function () {
+            this._draw();
             for (var id in this.state.players) {
                 this.player = this.state.players[id];
                 this.player = new object_1.GameObject(this.context, this.canvas, this.player.x, this.player.y, PLAYER_SIZE, PLAYER_SIZE, PLAYER_COLOR, PLAYER_RADIUS, PLAYER_ACCELERATION);
                 this.movement.acceleration = this.player.acceleration;
-                this._draw();
+                this.context.setTransform(X_REVIEW / this.canvas.width, 0, 0, Y_REVIEW / this.canvas.height, this._gameCameraCoordinates().x, this._gameCameraCoordinates().y);
                 this._update();
                 this._drawPlayer();
             }
@@ -243,6 +253,8 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
                 canvas.height = height;
                 X_REVIEW = width / RESIZE_COEF;
                 Y_REVIEW = height / RESIZE_COEF;
+                this.movement.canvasWidth = canvas.width;
+                this.movement.canvasHeight = canvas.height;
                 return true;
             }
             return false;

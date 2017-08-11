@@ -75,6 +75,8 @@ class Game implements IGame {
         x: 0,
         y: 0,
         acceleration: 0,
+        canvasWidth: 0,
+        canvasHeight: 0,
     };
 
     constructor() {
@@ -110,11 +112,14 @@ class Game implements IGame {
 
     _update() {
         socket.emit('movement', this.movement);
+       // this.context.setTransform(X_REVIEW / this.canvas.width, 0, 0, Y_REVIEW / this.canvas.height, this._gameCameraCoordinates().x, this._gameCameraCoordinates().y);
     }
 
 
     _draw() {
+        this.context.setTransform(1, 0, 0, 1, 0, 0);
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
         this.field.draw(this.context);
         this._drawDots();
     }
@@ -131,6 +136,11 @@ class Game implements IGame {
         }
     }
 
+    _gameCameraCoordinates() {
+        let cameraX = Math.round((this.canvas.width / CANVAS_SCALE - this.player._x - this.player._width / 2));
+        let cameraY = Math.round((this.canvas.height / CANVAS_SCALE - this.player._y - this.player._height / 2));
+        return {x: cameraX, y: cameraY}
+    }
 
     onLoop() {
         this._draw();
@@ -153,6 +163,8 @@ class Game implements IGame {
             canvas.height = height;
             X_REVIEW = width / RESIZE_COEF;
             Y_REVIEW = height / RESIZE_COEF;
+            this.movement.canvasWidth = canvas.width;
+            this.movement.canvasHeight = canvas.height;
             return true;
         }
         return false;
