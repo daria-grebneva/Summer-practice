@@ -145,11 +145,11 @@ define("dot", ["require", "exports", "circle"], function (require, exports, circ
 define("game", ["require", "exports", "field", "object", "dot"], function (require, exports, field_1, object_1, dot_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var PLAYER_SIZE = 20 / 2000;
-    var PLAYER_RADIUS = 10 / 700;
+    var PLAYER_SIZE = 10 / 2000;
+    var PLAYER_RADIUS = 5 / 700;
     var PLAYER_COLOR = '#183c3d';
     var MAX_ENEMY_NUMBER = 6;
-    var SMALL_BALL_SIZE = 8 / 2000;
+    //const SMALL_BALL_SIZE = 8 / 2000;
     var SMALL_BALL_RADIUS = 4 / 700;
     var BACKGROUND_COLOR = '#eeeefe';
     var CONVERGENCE_RADIUS = 5 / 15;
@@ -160,9 +160,9 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
     var PLAYER_ACCELERATION = 0.2;
     var ENEMY_ACCELERATION = 0.01;
     var LOW_ACCELERATION = 0.0045;
-    var CANVAS_SCALE = 40;
-    var X_REVIEW = 3800;
-    var Y_REVIEW = 1840;
+    var CANVAS_SCALE = 50; //40;
+    var X_REVIEW = 3800; //3800;
+    var Y_REVIEW = 1840; //1840;
     var RESIZE_COEF = 0.505;
     var socket = io();
     var Game = (function () {
@@ -173,13 +173,21 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
                 id: 0,
                 dots: null,
                 dots_length: 0,
+                x: 0,
+                y: 0,
             };
             this.movement = {
                 x: 0,
                 y: 0,
                 acceleration: 0,
-                canvasWidth: 0,
-                canvasHeight: 0,
+                width: 0,
+                height: 0,
+                radius: 0,
+            };
+            this.collision = {
+                predator: 0,
+                victim: 0,
+                acceleration: 0,
             };
             this.start = false;
             this.playerWin = true;
@@ -188,16 +196,16 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
             this.context = this.canvas.getContext("2d");
             this.field = new field_1.Field(this.context, this.canvas, 0, 0, 1, 1, BACKGROUND_COLOR);
             this.dots = [];
-            document.addEventListener("mousemove", function (event) {
-                _this.movement.x = (event.offsetX / _this.canvas.clientWidth);
-                _this.movement.y = (event.offsetY / _this.canvas.clientHeight);
-            });
+            this.player = new object_1.GameObject(this.context, this.canvas, this.canvas.width / 2, this.canvas.height / 2, PLAYER_SIZE, PLAYER_SIZE, PLAYER_COLOR, PLAYER_RADIUS, PLAYER_ACCELERATION);
+            this.movement.acceleration = this.player.acceleration;
             socket.emit('new player');
             socket.on("player_created", function () {
                 socket.on('state', function (state) {
                     _this.state.players = state.players;
                     _this.state.dots = state.dots;
                     _this.state.dots_length = state.dots.length;
+                    /* this.state.x = state.x;
+                     this.state.y = state.y;*/
                 });
             });
             socket.emit('disconnect');
@@ -208,39 +216,57 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
             requestAnimationFrame(this.onLoop.bind(this));
         }
         Game.prototype._update = function () {
+            var _this = this;
             socket.emit('movement', this.movement);
-            // this.context.setTransform(X_REVIEW / this.canvas.width, 0, 0, Y_REVIEW / this.canvas.height, this._gameCameraCoordinates().x, this._gameCameraCoordinates().y);
+            socket.on("collision dot", function () {
+                /*          this.player.width = this.player.width + 0.001;
+                          this.player.height = this.player.height + 0.001;
+                          this.movement.radius = this.movement.radius + 0.001;*/
+                console.log(_this.movement.radius);
+            });
         };
         Game.prototype._draw = function () {
             this.context.setTransform(1, 0, 0, 1, 0, 0);
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.context.setTransform(X_REVIEW / this.canvas.width, 0, 0, Y_REVIEW / this.canvas.height, this._gameCameraCoordinates().x, this._gameCameraCoordinates().y);
             this.field.draw(this.context);
             this._drawDots();
         };
-        Game.prototype._drawPlayer = function () {
-            this.player.draw(this.context);
+        Game.prototype._drawPlayers = function () {
+            this.context.beginPath();
+            this.context.fillStyle = this.player.color;
+            this.context.arc(this.other_players.x * this.canvas.width, this.other_players.y * this.canvas.height, this.other_players.radius * this.canvas.width, 0, Math.PI * 2);
+            this.context.fill();
         };
         Game.prototype._drawDots = function () {
             for (var i = 0; i < this.state.dots_length; i++) {
                 var dot = this.state.dots[i];
-                dot = new dot_1.Dot(this.context, this.canvas, dot.x, dot.y, SMALL_BALL_SIZE, SMALL_BALL_SIZE, dot.color, SMALL_BALL_RADIUS);
+                dot = new dot_1.Dot(this.context, this.canvas, dot.x, dot.y, dot.width, dot.height, dot.color, SMALL_BALL_RADIUS);
                 dot.draw(this.context);
             }
         };
         Game.prototype._gameCameraCoordinates = function () {
-            var cameraX = Math.round((this.canvas.width / CANVAS_SCALE - this.player._x - this.player._width / 2));
-            var cameraY = Math.round((this.canvas.height / CANVAS_SCALE - this.player._y - this.player._height / 2));
+            var cameraX = Math.round((this.canvas.width / CANVAS_SCALE - this.movement.x * this.canvas.width - this.player._width / 2));
+            var cameraY = Math.round((this.canvas.height / CANVAS_SCALE - this.movement.y * this.canvas.height - this.player._height / 2));
             return { x: cameraX, y: cameraY };
         };
+        Game.prototype._mouseCoordinates = function () {
+            var _this = this;
+            addEventListener("mousemove", function (event) {
+                _this.movement.x = (event.offsetX / _this.canvas.clientWidth);
+                _this.movement.y = (event.offsetY / _this.canvas.clientHeight);
+            });
+        };
         Game.prototype.onLoop = function () {
+            this._mouseCoordinates();
             this._draw();
             for (var id in this.state.players) {
-                this.player = this.state.players[id];
-                this.player = new object_1.GameObject(this.context, this.canvas, this.player.x, this.player.y, PLAYER_SIZE, PLAYER_SIZE, PLAYER_COLOR, PLAYER_RADIUS, PLAYER_ACCELERATION);
-                this.movement.acceleration = this.player.acceleration;
-                this.context.setTransform(X_REVIEW / this.canvas.width, 0, 0, Y_REVIEW / this.canvas.height, this._gameCameraCoordinates().x, this._gameCameraCoordinates().y);
+                this.other_players = this.state.players[id];
+                this.movement.width = this.other_players.width;
+                this.movement.height = this.other_players.height;
+                this.movement.radius = this.other_players.radius;
                 this._update();
-                this._drawPlayer();
+                this._drawPlayers();
             }
             requestAnimationFrame(this.onLoop.bind(this));
         };
@@ -253,8 +279,6 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
                 canvas.height = height;
                 X_REVIEW = width / RESIZE_COEF;
                 Y_REVIEW = height / RESIZE_COEF;
-                this.movement.canvasWidth = canvas.width;
-                this.movement.canvasHeight = canvas.height;
                 return true;
             }
             return false;
