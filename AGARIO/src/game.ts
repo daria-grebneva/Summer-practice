@@ -6,29 +6,15 @@ const PLAYER_SIZE = 10 / 2000;
 const PLAYER_RADIUS = 5 / 700;
 const PLAYER_COLOR = '#183c3d';
 
-
-const MAX_ENEMY_NUMBER = 6;
-
-//const SMALL_BALL_SIZE = 8 / 2000;
-const SMALL_BALL_RADIUS = 4 / 700;
-
 const BACKGROUND_COLOR = '#eeeefe';
-
-const CONVERGENCE_RADIUS = 5 / 15;
-
-const ENEMY_SIZE = 22 / 2000;
-const ENEMY_RADIUS = 12 / 700;
-
 const FIELD_COLOR = '#d7f4de';
 const FONT_COLOR = '#937cdd';
 
 const PLAYER_ACCELERATION = 0.2;
-const ENEMY_ACCELERATION = 0.01;
-const LOW_ACCELERATION = 0.0045;
 
-const CANVAS_SCALE = 50;//40;
-let X_REVIEW = 3800;//3800;
-let Y_REVIEW = 1840;//1840;
+const CANVAS_SCALE = 50;
+let X_REVIEW = 3800;
+let Y_REVIEW = 1840;
 
 const RESIZE_COEF = 0.505;
 
@@ -63,32 +49,28 @@ class Game implements IGame {
     public dots: Array<Circle>;
     public canvas: HTMLCanvasElement;
     public context: CanvasRenderingContext2D;
-    public playerX: number;
-    public playerY: number;
     public players: void;
     public state = {
         players: null,
         id: 0,
         dots: null,
         dots_length: 0,
+        dots_width: 0,
+        dots_radius: 0,
+        enemies: null,
+        enemies_length: 0,
+        enemies_width: 0,
+        enemies_radius: 0,
         x: 0,
         y: 0,
     };
     public movement = {
         x: 0,
         y: 0,
-        acceleration: 0,
         width: 0,
         height: 0,
         radius: 0,
     };
-
-    public collision = {
-        predator: 0,
-        victim: 0,
-        acceleration: 0,
-    };
-
 
     constructor() {
 
@@ -101,17 +83,29 @@ class Game implements IGame {
         this.dots = [];
 
         this.player = new GameObject(this.context, this.canvas, this.canvas.width / 2, this.canvas.height / 2, PLAYER_SIZE, PLAYER_SIZE, PLAYER_COLOR, PLAYER_RADIUS, PLAYER_ACCELERATION);
-        this.movement.acceleration = this.player.acceleration;
-
         socket.emit('new player');
+        this.canvas.onclick = (event) => {
+            this.start = true;
+        };
         socket.on("player_created", () => {
             socket.on('state', (state) => {
                 this.state.players = state.players;
                 this.state.dots = state.dots;
                 this.state.dots_length = state.dots.length;
-               /* this.state.x = state.x;
-                this.state.y = state.y;*/
+                for (let i = 0; i < this.state.dots_length; i++) {
+                    this.state.dots_width = state.dots[i].width;
+                    this.state.dots_radius = state.dots[i].radius;
+                }
+                this.state.enemies = state.enemies;
+                this.state.enemies_length = state.enemies.length;
+                for (let i = 0; i < this.state.enemies_length; i++) {
+                    this.state.enemies_width = state.enemies[i].width;
+                    this.state.enemies_radius = state.enemies[i].radius;
+                }
             });
+        });
+        socket.on("player_eaten", () => {
+            //TODO :: сделать заставку для "съеденного" ПРОБЛЕМА: когда игрок съедается, его нет и не действует !this.player
         });
 
         socket.emit('disconnect');
@@ -124,36 +118,57 @@ class Game implements IGame {
 
     _update() {
         socket.emit('movement', this.movement);
-        socket.on("collision dot", () => {
-
-  /*          this.player.width = this.player.width + 0.001;
-            this.player.height = this.player.height + 0.001;
-            this.movement.radius = this.movement.radius + 0.001;*/
-            console.log(this.movement.radius);
-        })
+        socket.on("collision dot");
     }
 
+    _drawWallpaper() {
+        this.context.fillStyle = FIELD_COLOR;
+        this.context.globalAlpha = 1;
+        this.context.fillRect(0, 0, this.canvas.scrollWidth, this.canvas.scrollHeight);
+        this.context.fillStyle = FONT_COLOR;
+        this.context.font = this.canvas.height * 1 / 7 + 'px slabo';
+        this.context.fillText('AGARIO', this.canvas.width * 3 / 10, this.canvas.height * 4 / 10);
+        this.context.font = this.canvas.height * 1 / 9 + 'px slabo';
+        this.context.fillText('Click to continue', this.canvas.width * 3 / 10, this.canvas.height * 5 / 10);
+        if (this.numberOfGames > 0) {
+            this.context.font = this.canvas.height * 1 / 9 + 'px slabo';
+            this.context.fillText('You ate', this.canvas.width * 3 / 10, this.canvas.height * 6 / 10);
+        }
+    }
 
     _draw() {
         this.context.setTransform(1, 0, 0, 1, 0, 0);
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.context.setTransform(X_REVIEW / this.canvas.width, 0, 0, Y_REVIEW / this.canvas.height, this._gameCameraCoordinates().x, this._gameCameraCoordinates().y);
         this.field.draw(this.context);
+        this._drawEnemies();
         this._drawDots();
+
     }
 
     _drawPlayers() {
         this.context.beginPath();
-        this.context.fillStyle = this.player.color;
-        this.context.arc(this.other_players.x * this.canvas.width, this.other_players.y * this.canvas.height, this.other_players.radius * this.canvas.width, 0, Math.PI * 2);
+        this.context.fillStyle = this.other_players.color;
+        this.context.arc(this.other_players.x * this.canvas.width, this.other_players.y * this.canvas.height, this.movement.radius * this.canvas.width, 0, Math.PI * 2);
         this.context.fill();
     }
 
     _drawDots() {
         for (let i = 0; i < this.state.dots_length; i++) {
             let dot = this.state.dots[i];
-            dot = new Dot(this.context, this.canvas, dot.x, dot.y, dot.width, dot.height, dot.color, SMALL_BALL_RADIUS);
+            dot = new Dot(this.context, this.canvas, dot.x, dot.y, dot.width, dot.height, dot.color, dot.radius);
             dot.draw(this.context);
+        }
+    }
+
+    _drawEnemies() {
+        for (let i = 0; i < this.state.enemies_length; i++) {
+            let enemy = this.state.enemies[i];
+            enemy = new GameObject(this.context, this.canvas, enemy.x, enemy.y, enemy.width, enemy.height, enemy.color, enemy.radius, enemy.acceleration);
+            this.context.beginPath();
+            this.context.fillStyle = enemy.color;
+            this.context.arc(enemy.x * this.canvas.width, enemy.y * this.canvas.height, enemy.radius * this.canvas.width, 0, Math.PI * 2);
+            this.context.fill();
         }
     }
 
@@ -175,11 +190,15 @@ class Game implements IGame {
         this._draw();
         for (let id in this.state.players) {
             this.other_players = this.state.players[id];
-           this.movement.width = this.other_players.width;
+            this.movement.width = this.other_players.width;
             this.movement.height = this.other_players.height;
             this.movement.radius = this.other_players.radius;
             this._update();
+            this._drawEnemies();
             this._drawPlayers();
+        }
+        if (!this.start) {
+            this._drawWallpaper();
         }
         requestAnimationFrame(this.onLoop.bind(this));
     }

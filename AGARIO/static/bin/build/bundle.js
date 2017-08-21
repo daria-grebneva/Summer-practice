@@ -100,7 +100,7 @@ define("circle", ["require", "exports", "shape"], function (require, exports, sh
         Circle.prototype.draw = function (context) {
             context.beginPath();
             context.fillStyle = this.color;
-            context.arc(this.x * this.canvas.width, this.y * this.canvas.height, this._radius, 0, Math.PI * 2);
+            context.arc(this.x * this.canvas.width, this.y * this.canvas.height, this.radius * this.canvas.width, 0, Math.PI * 2);
             context.fill();
         };
         return Circle;
@@ -148,21 +148,13 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
     var PLAYER_SIZE = 10 / 2000;
     var PLAYER_RADIUS = 5 / 700;
     var PLAYER_COLOR = '#183c3d';
-    var MAX_ENEMY_NUMBER = 6;
-    //const SMALL_BALL_SIZE = 8 / 2000;
-    var SMALL_BALL_RADIUS = 4 / 700;
     var BACKGROUND_COLOR = '#eeeefe';
-    var CONVERGENCE_RADIUS = 5 / 15;
-    var ENEMY_SIZE = 22 / 2000;
-    var ENEMY_RADIUS = 12 / 700;
     var FIELD_COLOR = '#d7f4de';
     var FONT_COLOR = '#937cdd';
     var PLAYER_ACCELERATION = 0.2;
-    var ENEMY_ACCELERATION = 0.01;
-    var LOW_ACCELERATION = 0.0045;
-    var CANVAS_SCALE = 50; //40;
-    var X_REVIEW = 3800; //3800;
-    var Y_REVIEW = 1840; //1840;
+    var CANVAS_SCALE = 50;
+    var X_REVIEW = 3800;
+    var Y_REVIEW = 1840;
     var RESIZE_COEF = 0.505;
     var socket = io();
     var Game = (function () {
@@ -173,21 +165,21 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
                 id: 0,
                 dots: null,
                 dots_length: 0,
+                dots_width: 0,
+                dots_radius: 0,
+                enemies: null,
+                enemies_length: 0,
+                enemies_width: 0,
+                enemies_radius: 0,
                 x: 0,
                 y: 0,
             };
             this.movement = {
                 x: 0,
                 y: 0,
-                acceleration: 0,
                 width: 0,
                 height: 0,
                 radius: 0,
-            };
-            this.collision = {
-                predator: 0,
-                victim: 0,
-                acceleration: 0,
             };
             this.start = false;
             this.playerWin = true;
@@ -197,16 +189,29 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
             this.field = new field_1.Field(this.context, this.canvas, 0, 0, 1, 1, BACKGROUND_COLOR);
             this.dots = [];
             this.player = new object_1.GameObject(this.context, this.canvas, this.canvas.width / 2, this.canvas.height / 2, PLAYER_SIZE, PLAYER_SIZE, PLAYER_COLOR, PLAYER_RADIUS, PLAYER_ACCELERATION);
-            this.movement.acceleration = this.player.acceleration;
             socket.emit('new player');
+            this.canvas.onclick = function (event) {
+                _this.start = true;
+            };
             socket.on("player_created", function () {
                 socket.on('state', function (state) {
                     _this.state.players = state.players;
                     _this.state.dots = state.dots;
                     _this.state.dots_length = state.dots.length;
-                    /* this.state.x = state.x;
-                     this.state.y = state.y;*/
+                    for (var i = 0; i < _this.state.dots_length; i++) {
+                        _this.state.dots_width = state.dots[i].width;
+                        _this.state.dots_radius = state.dots[i].radius;
+                    }
+                    _this.state.enemies = state.enemies;
+                    _this.state.enemies_length = state.enemies.length;
+                    for (var i = 0; i < _this.state.enemies_length; i++) {
+                        _this.state.enemies_width = state.enemies[i].width;
+                        _this.state.enemies_radius = state.enemies[i].radius;
+                    }
                 });
+            });
+            socket.on("player_eaten", function () {
+                //TODO :: сделать заставку для "съеденного" ПРОБЛЕМА: когда игрок съедается, его нет и не действует !this.player
             });
             socket.emit('disconnect');
             window.addEventListener("resize", function () {
@@ -216,33 +221,52 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
             requestAnimationFrame(this.onLoop.bind(this));
         }
         Game.prototype._update = function () {
-            var _this = this;
             socket.emit('movement', this.movement);
-            socket.on("collision dot", function () {
-                /*          this.player.width = this.player.width + 0.001;
-                          this.player.height = this.player.height + 0.001;
-                          this.movement.radius = this.movement.radius + 0.001;*/
-                console.log(_this.movement.radius);
-            });
+            socket.on("collision dot");
+        };
+        Game.prototype._drawWallpaper = function () {
+            this.context.fillStyle = FIELD_COLOR;
+            this.context.globalAlpha = 1;
+            this.context.fillRect(0, 0, this.canvas.scrollWidth, this.canvas.scrollHeight);
+            this.context.fillStyle = FONT_COLOR;
+            this.context.font = this.canvas.height * 1 / 7 + 'px slabo';
+            this.context.fillText('AGARIO', this.canvas.width * 3 / 10, this.canvas.height * 4 / 10);
+            this.context.font = this.canvas.height * 1 / 9 + 'px slabo';
+            this.context.fillText('Click to continue', this.canvas.width * 3 / 10, this.canvas.height * 5 / 10);
+            if (this.numberOfGames > 0) {
+                this.context.font = this.canvas.height * 1 / 9 + 'px slabo';
+                this.context.fillText('You ate', this.canvas.width * 3 / 10, this.canvas.height * 6 / 10);
+            }
         };
         Game.prototype._draw = function () {
             this.context.setTransform(1, 0, 0, 1, 0, 0);
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
             this.context.setTransform(X_REVIEW / this.canvas.width, 0, 0, Y_REVIEW / this.canvas.height, this._gameCameraCoordinates().x, this._gameCameraCoordinates().y);
             this.field.draw(this.context);
+            this._drawEnemies();
             this._drawDots();
         };
         Game.prototype._drawPlayers = function () {
             this.context.beginPath();
-            this.context.fillStyle = this.player.color;
-            this.context.arc(this.other_players.x * this.canvas.width, this.other_players.y * this.canvas.height, this.other_players.radius * this.canvas.width, 0, Math.PI * 2);
+            this.context.fillStyle = this.other_players.color;
+            this.context.arc(this.other_players.x * this.canvas.width, this.other_players.y * this.canvas.height, this.movement.radius * this.canvas.width, 0, Math.PI * 2);
             this.context.fill();
         };
         Game.prototype._drawDots = function () {
             for (var i = 0; i < this.state.dots_length; i++) {
                 var dot = this.state.dots[i];
-                dot = new dot_1.Dot(this.context, this.canvas, dot.x, dot.y, dot.width, dot.height, dot.color, SMALL_BALL_RADIUS);
+                dot = new dot_1.Dot(this.context, this.canvas, dot.x, dot.y, dot.width, dot.height, dot.color, dot.radius);
                 dot.draw(this.context);
+            }
+        };
+        Game.prototype._drawEnemies = function () {
+            for (var i = 0; i < this.state.enemies_length; i++) {
+                var enemy = this.state.enemies[i];
+                enemy = new object_1.GameObject(this.context, this.canvas, enemy.x, enemy.y, enemy.width, enemy.height, enemy.color, enemy.radius, enemy.acceleration);
+                this.context.beginPath();
+                this.context.fillStyle = enemy.color;
+                this.context.arc(enemy.x * this.canvas.width, enemy.y * this.canvas.height, enemy.radius * this.canvas.width, 0, Math.PI * 2);
+                this.context.fill();
             }
         };
         Game.prototype._gameCameraCoordinates = function () {
@@ -266,7 +290,11 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
                 this.movement.height = this.other_players.height;
                 this.movement.radius = this.other_players.radius;
                 this._update();
+                this._drawEnemies();
                 this._drawPlayers();
+            }
+            if (!this.start) {
+                this._drawWallpaper();
             }
             requestAnimationFrame(this.onLoop.bind(this));
         };
