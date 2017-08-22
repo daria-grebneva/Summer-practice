@@ -6,12 +6,12 @@ export interface ICircle {
 export class Circle extends Shape implements ICircle {
     public radius: number;
 
-    constructor(context: CanvasRenderingContext2D, canvas: HTMLCanvasElement, _x: number, _y: number, _width: number, _height: number, color: any, _radius: number) {
+    constructor(context: CanvasRenderingContext2D, canvas: HTMLCanvasElement, _x: number, _y: number, _width: number, _height: number, color: any, scaledRadius: number) {
         super(context, canvas, _x, _y, _width, _height, color);
-        this.radius = _radius;
+        this.radius = scaledRadius;
     }
 
-    public get _radius(): number {
+    public get scaledRadius(): number {
         return this.radius * this.canvas.height;
     }
 

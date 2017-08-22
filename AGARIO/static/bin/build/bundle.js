@@ -11,37 +11,37 @@ var __extends = (this && this.__extends) || (function () {
 define("shape", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var Shape = (function () {
-        function Shape(context, canvas, _x, _y, _width, _height, color) {
+    var Shape = /** @class */ (function () {
+        function Shape(context, canvas, scaledX, scaledY, scaledWidth, scaledHeight, color) {
             this.canvas = canvas;
-            this.x = _x;
-            this.y = _y;
-            this.width = _width;
-            this.height = _height;
+            this.x = scaledX;
+            this.y = scaledY;
+            this.width = scaledWidth;
+            this.height = scaledHeight;
             this.color = color;
         }
-        Object.defineProperty(Shape.prototype, "_x", {
+        Object.defineProperty(Shape.prototype, "scaledX", {
             get: function () {
                 return this.x * this.canvas.width;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Shape.prototype, "_y", {
+        Object.defineProperty(Shape.prototype, "scaledY", {
             get: function () {
                 return this.y * this.canvas.height;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Shape.prototype, "_width", {
+        Object.defineProperty(Shape.prototype, "scaledWidth", {
             get: function () {
                 return this.width * this.canvas.width;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Shape.prototype, "_height", {
+        Object.defineProperty(Shape.prototype, "scaledHeight", {
             get: function () {
                 return this.height * this.canvas.height;
             },
@@ -55,14 +55,14 @@ define("shape", ["require", "exports"], function (require, exports) {
 define("rectangle", ["require", "exports", "shape"], function (require, exports, shape_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var Rectangle = (function (_super) {
+    var Rectangle = /** @class */ (function (_super) {
         __extends(Rectangle, _super);
-        function Rectangle(context, canvas, _x, _y, _width, _height, color) {
-            return _super.call(this, context, canvas, _x, _y, _width, _height, color) || this;
+        function Rectangle(context, canvas, scaledX, scaledY, scaledWidth, scaledHeight, color) {
+            return _super.call(this, context, canvas, scaledX, scaledY, scaledWidth, scaledHeight, color) || this;
         }
         Rectangle.prototype.draw = function (context) {
             context.fillStyle = this.color;
-            context.fillRect(this._x, this._y, this._width, this._height);
+            context.fillRect(this.scaledX, this.scaledY, this.scaledWidth, this.scaledHeight);
         };
         return Rectangle;
     }(shape_1.Shape));
@@ -71,7 +71,7 @@ define("rectangle", ["require", "exports", "shape"], function (require, exports,
 define("field", ["require", "exports", "rectangle"], function (require, exports, rectangle_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var Field = (function (_super) {
+    var Field = /** @class */ (function (_super) {
         __extends(Field, _super);
         function Field(context, canvas, _x, _y, _width, _height, color) {
             return _super.call(this, context, canvas, _x, _y, _width, _height, color) || this;
@@ -83,14 +83,14 @@ define("field", ["require", "exports", "rectangle"], function (require, exports,
 define("circle", ["require", "exports", "shape"], function (require, exports, shape_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var Circle = (function (_super) {
+    var Circle = /** @class */ (function (_super) {
         __extends(Circle, _super);
-        function Circle(context, canvas, _x, _y, _width, _height, color, _radius) {
+        function Circle(context, canvas, _x, _y, _width, _height, color, scaledRadius) {
             var _this = _super.call(this, context, canvas, _x, _y, _width, _height, color) || this;
-            _this.radius = _radius;
+            _this.radius = scaledRadius;
             return _this;
         }
-        Object.defineProperty(Circle.prototype, "_radius", {
+        Object.defineProperty(Circle.prototype, "scaledRadius", {
             get: function () {
                 return this.radius * this.canvas.height;
             },
@@ -110,69 +110,70 @@ define("circle", ["require", "exports", "shape"], function (require, exports, sh
 define("object", ["require", "exports", "circle"], function (require, exports, circle_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var GameObject = (function (_super) {
+    var GameObject = /** @class */ (function (_super) {
         __extends(GameObject, _super);
         function GameObject(context, canvas, _x, _y, _width, _height, color, _radius, acceleration) {
             var _this = _super.call(this, context, canvas, _x, _y, _width, _height, color, _radius) || this;
             _this.acceleration = acceleration;
             return _this;
         }
-        GameObject.prototype.move = function (coordX, coordY) {
-            var xDistance = coordX - this.x;
-            var yDistance = coordY - this.y;
-            var distance = Math.sqrt(xDistance * xDistance + yDistance * yDistance);
-            if (distance > 0) {
-                this.x += xDistance * this.acceleration /* / this.canvas.width*/;
-                this.y += yDistance * this.acceleration /*/ this.canvas.height*/;
-            }
-        };
         return GameObject;
     }(circle_1.Circle));
     exports.GameObject = GameObject;
 });
-define("dot", ["require", "exports", "circle"], function (require, exports, circle_2) {
+define("food", ["require", "exports", "circle"], function (require, exports, circle_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var Dot = (function (_super) {
-        __extends(Dot, _super);
-        function Dot(context, canvas, _x, _y, _width, _height, color, _radius) {
+    var Food = /** @class */ (function (_super) {
+        __extends(Food, _super);
+        function Food(context, canvas, _x, _y, _width, _height, color, _radius) {
             return _super.call(this, context, canvas, _x, _y, _width, _height, color, _radius) || this;
         }
-        return Dot;
+        return Food;
     }(circle_2.Circle));
-    exports.Dot = Dot;
+    exports.Food = Food;
 });
-define("game", ["require", "exports", "field", "object", "dot"], function (require, exports, field_1, object_1, dot_1) {
+define("config", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var PLAYER_SIZE = 10 / 2000;
+    exports.PLAYER_SIZE = PLAYER_SIZE;
     var PLAYER_RADIUS = 5 / 700;
+    exports.PLAYER_RADIUS = PLAYER_RADIUS;
     var PLAYER_COLOR = '#183c3d';
+    exports.PLAYER_COLOR = PLAYER_COLOR;
     var BACKGROUND_COLOR = '#eeeefe';
-    var FIELD_COLOR = '#d7f4de';
-    var FONT_COLOR = '#937cdd';
+    exports.BACKGROUND_COLOR = BACKGROUND_COLOR;
     var PLAYER_ACCELERATION = 0.2;
-    var CANVAS_SCALE = 50;
+    exports.PLAYER_ACCELERATION = PLAYER_ACCELERATION;
+    var FIELD_COLOR = 'rgba(238, 238, 254, 0.8)';
+    exports.FIELD_COLOR = FIELD_COLOR;
+    var FONT_COLOR = '#937cdd';
+    exports.FONT_COLOR = FONT_COLOR;
+    var CANVAS_SCALE = 55;
+    exports.CANVAS_SCALE = CANVAS_SCALE;
     var X_REVIEW = 3800;
+    exports.X_REVIEW = X_REVIEW;
     var Y_REVIEW = 1840;
+    exports.Y_REVIEW = Y_REVIEW;
     var RESIZE_COEF = 0.505;
-    var socket = io();
-    var Game = (function () {
-        function Game() {
-            var _this = this;
+    exports.RESIZE_COEF = RESIZE_COEF;
+});
+define("painter", ["require", "exports", "object", "food", "config"], function (require, exports, object_1, food_1, config_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Painter = /** @class */ (function () {
+        function Painter() {
             this.state = {
                 players: null,
-                id: 0,
-                dots: null,
-                dots_length: 0,
-                dots_width: 0,
-                dots_radius: 0,
+                food: null,
+                food_length: 0,
+                food_width: 0,
+                food_radius: 0,
                 enemies: null,
                 enemies_length: 0,
                 enemies_width: 0,
                 enemies_radius: 0,
-                x: 0,
-                y: 0,
             };
             this.movement = {
                 x: 0,
@@ -181,85 +182,62 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
                 height: 0,
                 radius: 0,
             };
-            this.start = false;
-            this.playerWin = true;
-            this.numberOfGames = 0;
-            this.canvas = document.getElementById('canvas');
-            this.context = this.canvas.getContext("2d");
-            this.field = new field_1.Field(this.context, this.canvas, 0, 0, 1, 1, BACKGROUND_COLOR);
-            this.dots = [];
-            this.player = new object_1.GameObject(this.context, this.canvas, this.canvas.width / 2, this.canvas.height / 2, PLAYER_SIZE, PLAYER_SIZE, PLAYER_COLOR, PLAYER_RADIUS, PLAYER_ACCELERATION);
-            socket.emit('new player');
-            this.canvas.onclick = function (event) {
-                _this.start = true;
-            };
-            socket.on("player_created", function () {
-                socket.on('state', function (state) {
-                    _this.state.players = state.players;
-                    _this.state.dots = state.dots;
-                    _this.state.dots_length = state.dots.length;
-                    for (var i = 0; i < _this.state.dots_length; i++) {
-                        _this.state.dots_width = state.dots[i].width;
-                        _this.state.dots_radius = state.dots[i].radius;
-                    }
-                    _this.state.enemies = state.enemies;
-                    _this.state.enemies_length = state.enemies.length;
-                    for (var i = 0; i < _this.state.enemies_length; i++) {
-                        _this.state.enemies_width = state.enemies[i].width;
-                        _this.state.enemies_radius = state.enemies[i].radius;
-                    }
-                });
-            });
-            socket.on("player_eaten", function () {
-                //TODO :: сделать заставку для "съеденного" ПРОБЛЕМА: когда игрок съедается, его нет и не действует !this.player
-            });
-            socket.emit('disconnect');
-            window.addEventListener("resize", function () {
-                _this._resize();
-            });
-            this._resize(this.canvas);
-            requestAnimationFrame(this.onLoop.bind(this));
         }
-        Game.prototype._update = function () {
-            socket.emit('movement', this.movement);
-            socket.on("collision dot");
-        };
-        Game.prototype._drawWallpaper = function () {
-            this.context.fillStyle = FIELD_COLOR;
-            this.context.globalAlpha = 1;
-            this.context.fillRect(0, 0, this.canvas.scrollWidth, this.canvas.scrollHeight);
-            this.context.fillStyle = FONT_COLOR;
-            this.context.font = this.canvas.height * 1 / 7 + 'px slabo';
-            this.context.fillText('AGARIO', this.canvas.width * 3 / 10, this.canvas.height * 4 / 10);
-            this.context.font = this.canvas.height * 1 / 9 + 'px slabo';
-            this.context.fillText('Click to continue', this.canvas.width * 3 / 10, this.canvas.height * 5 / 10);
-            if (this.numberOfGames > 0) {
-                this.context.font = this.canvas.height * 1 / 9 + 'px slabo';
-                this.context.fillText('You ate', this.canvas.width * 3 / 10, this.canvas.height * 6 / 10);
-            }
-        };
-        Game.prototype._draw = function () {
+        Painter.prototype.paint = function (context, canvas, statePlayers, movement, player, field, start, food_length, enemies_length, food, enemies) {
+            this.context = context;
+            this.canvas = canvas;
+            this.state.players = statePlayers;
+            this.state.food_length = food_length;
+            this.state.enemies_length = enemies_length;
+            this.state.food = food;
+            this.state.enemies = enemies;
+            this.movement = movement;
+            this.player = player;
+            this.field = field;
+            this.start = start;
             this.context.setTransform(1, 0, 0, 1, 0, 0);
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            this.context.setTransform(X_REVIEW / this.canvas.width, 0, 0, Y_REVIEW / this.canvas.height, this._gameCameraCoordinates().x, this._gameCameraCoordinates().y);
+            config_1.X_REVIEW = this.canvas.width / config_1.RESIZE_COEF;
+            config_1.Y_REVIEW = this.canvas.height / config_1.RESIZE_COEF;
+            this.context.setTransform(config_1.X_REVIEW / this.canvas.width, 0, 0, config_1.Y_REVIEW / this.canvas.height, this._gameCameraCoordinates().x, this._gameCameraCoordinates().y);
             this.field.draw(this.context);
+            this._drawFood();
+            this._drawPlayers();
             this._drawEnemies();
-            this._drawDots();
-        };
-        Game.prototype._drawPlayers = function () {
-            this.context.beginPath();
-            this.context.fillStyle = this.other_players.color;
-            this.context.arc(this.other_players.x * this.canvas.width, this.other_players.y * this.canvas.height, this.movement.radius * this.canvas.width, 0, Math.PI * 2);
-            this.context.fill();
-        };
-        Game.prototype._drawDots = function () {
-            for (var i = 0; i < this.state.dots_length; i++) {
-                var dot = this.state.dots[i];
-                dot = new dot_1.Dot(this.context, this.canvas, dot.x, dot.y, dot.width, dot.height, dot.color, dot.radius);
-                dot.draw(this.context);
+            if (!this.start) {
+                this._drawWallpaper();
             }
         };
-        Game.prototype._drawEnemies = function () {
+        Painter.prototype._drawWallpaper = function () {
+            this.context.fillStyle = config_1.FIELD_COLOR;
+            this.context.globalAlpha = 1;
+            this.context.fillRect(0, 0, this.canvas.scrollWidth, this.canvas.scrollHeight);
+            this.context.fillStyle = config_1.FONT_COLOR;
+            this.context.font = this.canvas.height * 1 / 7 + 'px lobster';
+            this.context.fillText('AGARIO', this.canvas.width * 3 / 10, this.canvas.height * 4 / 10);
+            this.context.font = this.canvas.height * 1 / 9 + 'px lobster';
+            this.context.fillText('Click to continue', this.canvas.width * 3 / 10, this.canvas.height * 5 / 10);
+        };
+        Painter.prototype._drawPlayers = function () {
+            for (var id in this.state.players) {
+                this.other_players = this.state.players[id];
+                this.movement.width = this.other_players.width;
+                this.movement.height = this.other_players.height;
+                this.movement.radius = this.other_players.radius;
+                this.context.beginPath();
+                this.context.fillStyle = this.other_players.color;
+                this.context.arc(this.other_players.x * this.canvas.width, this.other_players.y * this.canvas.height, this.movement.radius * this.canvas.width, 0, Math.PI * 2);
+                this.context.fill();
+            }
+        };
+        Painter.prototype._drawFood = function () {
+            for (var i = 0; i < this.state.food_length; i++) {
+                var food = this.state.food[i];
+                food = new food_1.Food(this.context, this.canvas, food.x, food.y, food.width, food.height, food.color, food.radius);
+                food.draw(this.context);
+            }
+        };
+        Painter.prototype._drawEnemies = function () {
             for (var i = 0; i < this.state.enemies_length; i++) {
                 var enemy = this.state.enemies[i];
                 enemy = new object_1.GameObject(this.context, this.canvas, enemy.x, enemy.y, enemy.width, enemy.height, enemy.color, enemy.radius, enemy.acceleration);
@@ -269,10 +247,77 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
                 this.context.fill();
             }
         };
-        Game.prototype._gameCameraCoordinates = function () {
-            var cameraX = Math.round((this.canvas.width / CANVAS_SCALE - this.movement.x * this.canvas.width - this.player._width / 2));
-            var cameraY = Math.round((this.canvas.height / CANVAS_SCALE - this.movement.y * this.canvas.height - this.player._height / 2));
+        Painter.prototype._gameCameraCoordinates = function () {
+            var cameraX = Math.round((this.canvas.width / config_1.CANVAS_SCALE - this.movement.x * this.canvas.width - this.player.width / 2));
+            var cameraY = Math.round((this.canvas.height / config_1.CANVAS_SCALE - this.movement.y * this.canvas.height - this.player.height / 2));
             return { x: cameraX, y: cameraY };
+        };
+        return Painter;
+    }());
+    exports.Painter = Painter;
+});
+define("game", ["require", "exports", "field", "object", "painter", "config"], function (require, exports, field_1, object_2, painter_1, config_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var socket = io();
+    var Game = /** @class */ (function () {
+        function Game() {
+            var _this = this;
+            this.state = {
+                players: null,
+                food: null,
+                food_length: 0,
+                food_width: 0,
+                food_radius: 0,
+                enemies: null,
+                enemies_length: 0,
+                enemies_width: 0,
+                enemies_radius: 0,
+            };
+            this.movement = {
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0,
+                radius: 0,
+            };
+            this.start = false;
+            this.canvas = document.getElementById('canvas');
+            this.context = this.canvas.getContext("2d");
+            this.field = new field_1.Field(this.context, this.canvas, 0, 0, 1, 1, config_2.BACKGROUND_COLOR);
+            this.player = new object_2.GameObject(this.context, this.canvas, this.canvas.width / 2, this.canvas.height / 2, config_2.PLAYER_SIZE, config_2.PLAYER_SIZE, config_2.PLAYER_COLOR, config_2.PLAYER_RADIUS, config_2.PLAYER_ACCELERATION);
+            this.draw = new painter_1.Painter();
+            socket.emit('new player');
+            this.canvas.onclick = function (event) {
+                _this.start = true;
+            };
+            socket.on("player_created", function () {
+                socket.on('state', function (state) {
+                    _this.state.players = state.players;
+                    _this.state.food = state.food;
+                    _this.state.food_length = state.food.length;
+                    for (var i = 0; i < _this.state.food_length; i++) {
+                        _this.state.food_width = state.food[i].width;
+                        _this.state.food_radius = state.food[i].radius;
+                    }
+                    _this.state.enemies = state.enemies;
+                    _this.state.enemies_length = state.enemies.length;
+                    for (var i = 0; i < _this.state.enemies_length; i++) {
+                        _this.state.enemies_width = state.enemies[i].width;
+                        _this.state.enemies_radius = state.enemies[i].radius;
+                    }
+                });
+            });
+            socket.emit('disconnect');
+            window.addEventListener("resize", function () {
+                _this._resize();
+            });
+            this._resize();
+            requestAnimationFrame(this.onLoop.bind(this));
+        }
+        Game.prototype._update = function () {
+            socket.emit('movement', this.movement);
+            this._mouseCoordinates();
         };
         Game.prototype._mouseCoordinates = function () {
             var _this = this;
@@ -282,20 +327,8 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
             });
         };
         Game.prototype.onLoop = function () {
-            this._mouseCoordinates();
-            this._draw();
-            for (var id in this.state.players) {
-                this.other_players = this.state.players[id];
-                this.movement.width = this.other_players.width;
-                this.movement.height = this.other_players.height;
-                this.movement.radius = this.other_players.radius;
-                this._update();
-                this._drawEnemies();
-                this._drawPlayers();
-            }
-            if (!this.start) {
-                this._drawWallpaper();
-            }
+            this._update();
+            this.draw.paint(this.context, this.canvas, this.state.players, this.movement, this.player, this.field, this.start, this.state.food_length, this.state.enemies_length, this.state.food, this.state.enemies);
             requestAnimationFrame(this.onLoop.bind(this));
         };
         Game.prototype._resize = function () {
@@ -305,8 +338,6 @@ define("game", ["require", "exports", "field", "object", "dot"], function (requi
             if (canvas.width !== width || canvas.height !== height) {
                 canvas.width = width;
                 canvas.height = height;
-                X_REVIEW = width / RESIZE_COEF;
-                Y_REVIEW = height / RESIZE_COEF;
                 return true;
             }
             return false;
