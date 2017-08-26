@@ -1,6 +1,6 @@
 const nodeExternals = require('webpack-node-externals');
 module.exports = {
-  entry: './server_modules/common.js',
+  entry: './src/server/Main.js',
   output: {
     filename: './server.js',
     library: 'myApp'

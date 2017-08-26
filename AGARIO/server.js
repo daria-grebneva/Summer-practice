@@ -125,36 +125,51 @@ exports.RESIZE_COEF = RESIZE_COEF;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.rebirth = rebirth;
-exports.getRandomCoordinates = getRandomCoordinates;
-exports.getRandomColor = getRandomColor;
+exports.Make = undefined;
 
-var _config = __webpack_require__(0);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function rebirth(id, state) {
-  state.players[id] = {
-    x: getRandomCoordinates(0, 1),
-    y: getRandomCoordinates(0, 1),
-    radius: _config.PLAYER_RADIUS,
-    color: getRandomColor(),
-    width: _config.PLAYER_SIZE,
-    height: _config.PLAYER_SIZE,
-    acceleration: _config.PLAYER_ACCELERATION
-  };
-}
+var _Config = __webpack_require__(0);
 
-function getRandomCoordinates(min, max) {
-  return Math.random() * (max - min) + min;
-}
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function getRandomColor() {
-  var letters = '0123456789ABCDEF';
-  var colorNum = '#';
-  for (var i = 0; i < 6; i++) {
-    colorNum += letters[Math.floor(Math.random() * 16)];
+var Make = exports.Make = function () {
+  function Make() {
+    _classCallCheck(this, Make);
   }
-  return colorNum;
-}
+
+  _createClass(Make, null, [{
+    key: 'rebirth',
+    value: function rebirth(id, state) {
+      state.players[id] = {
+        x: this.randomCoordinates(0, 1),
+        y: this.randomCoordinates(0, 1),
+        radius: _Config.PLAYER_RADIUS,
+        color: this.randomColor(),
+        width: _Config.PLAYER_SIZE,
+        height: _Config.PLAYER_SIZE,
+        acceleration: _Config.PLAYER_ACCELERATION
+      };
+    }
+  }, {
+    key: 'randomCoordinates',
+    value: function randomCoordinates(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+  }, {
+    key: 'randomColor',
+    value: function randomColor() {
+      var letters = '0123456789ABCDEF';
+      var colorNum = '#';
+      for (var i = 0; i < 6; i++) {
+        colorNum += letters[Math.floor(Math.random() * 16)];
+      }
+      return colorNum;
+    }
+  }]);
+
+  return Make;
+}();
 
 /***/ }),
 /* 2 */
@@ -166,25 +181,40 @@ function getRandomColor() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.initFoodPositions = initFoodPositions;
+exports.FoodPositions = undefined;
 
-var _rebirth = __webpack_require__(1);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _config = __webpack_require__(0);
+var _Rebirth = __webpack_require__(1);
 
-function initFoodPositions(food) {
-  for (var i = 0; _config.MAX_FOOD_NUMBER - food.length > 0; i++) {
-    food.push({
-      x: (0, _rebirth.getRandomCoordinates)(0, 1),
-      y: (0, _rebirth.getRandomCoordinates)(0, 1),
-      color: (0, _rebirth.getRandomColor)(),
-      width: _config.SMALL_BALL_SIZE,
-      height: _config.SMALL_BALL_SIZE,
-      radius: _config.SMALL_BALL_RADIUS
-    });
+var _Config = __webpack_require__(0);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var FoodPositions = exports.FoodPositions = function () {
+  function FoodPositions() {
+    _classCallCheck(this, FoodPositions);
   }
-  return food;
-}
+
+  _createClass(FoodPositions, null, [{
+    key: 'init',
+    value: function init(food) {
+      for (var i = 0; _Config.MAX_FOOD_NUMBER - food.length > 0; i++) {
+        food.push({
+          x: _Rebirth.Make.randomCoordinates(0, 1),
+          y: _Rebirth.Make.randomCoordinates(0, 1),
+          color: _Rebirth.Make.randomColor(),
+          width: _Config.SMALL_BALL_SIZE,
+          height: _Config.SMALL_BALL_SIZE,
+          radius: _Config.SMALL_BALL_RADIUS
+        });
+      }
+      return food;
+    }
+  }]);
+
+  return FoodPositions;
+}();
 
 /***/ }),
 /* 3 */
@@ -196,26 +226,41 @@ function initFoodPositions(food) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.initEnemiesPositions = initEnemiesPositions;
+exports.EnemiesPositions = undefined;
 
-var _rebirth = __webpack_require__(1);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _config = __webpack_require__(0);
+var _Rebirth = __webpack_require__(1);
 
-function initEnemiesPositions(enemies) {
-  for (var i = 0; _config.MAX_ENEMY_NUMBER - enemies.length > 0; i++) {
-    enemies.push({
-      x: (0, _rebirth.getRandomCoordinates)(0, 1),
-      y: (0, _rebirth.getRandomCoordinates)(0, 1),
-      color: (0, _rebirth.getRandomColor)(),
-      width: _config.ENEMY_SIZE,
-      height: _config.ENEMY_SIZE,
-      radius: _config.ENEMY_RADIUS,
-      acceleration: _config.ENEMY_ACCELERATION
-    });
+var _Config = __webpack_require__(0);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var EnemiesPositions = exports.EnemiesPositions = function () {
+  function EnemiesPositions() {
+    _classCallCheck(this, EnemiesPositions);
   }
-  return enemies;
-}
+
+  _createClass(EnemiesPositions, null, [{
+    key: 'init',
+    value: function init(enemies) {
+      for (var i = 0; _Config.MAX_ENEMY_NUMBER - enemies.length > 0; i++) {
+        enemies.push({
+          x: _Rebirth.Make.randomCoordinates(0, 1),
+          y: _Rebirth.Make.randomCoordinates(0, 1),
+          color: _Rebirth.Make.randomColor(),
+          width: _Config.ENEMY_SIZE,
+          height: _Config.ENEMY_SIZE,
+          radius: _Config.ENEMY_RADIUS,
+          acceleration: _Config.ENEMY_ACCELERATION
+        });
+      }
+      return enemies;
+    }
+  }]);
+
+  return EnemiesPositions;
+}();
 
 /***/ }),
 /* 4 */
@@ -224,15 +269,15 @@ function initEnemiesPositions(enemies) {
 "use strict";
 
 
-var _canEat = __webpack_require__(5);
+var _CanEat = __webpack_require__(5);
 
-var _enemiesMove = __webpack_require__(6);
+var _EnemiesMove = __webpack_require__(6);
 
-var _newPlayer = __webpack_require__(7);
+var _NewPlayer = __webpack_require__(7);
 
-var _initFoodPositions = __webpack_require__(2);
+var _InitFoodPositions = __webpack_require__(2);
 
-var _initEnemiesPositions = __webpack_require__(3);
+var _InitEnemiesPositions = __webpack_require__(3);
 
 var express = __webpack_require__(8);
 var http = __webpack_require__(9);
@@ -259,12 +304,12 @@ server.listen(5000, function () {
 
 var state = {
   "players": {},
-  "food": (0, _initFoodPositions.initFoodPositions)(food),
-  "enemies": (0, _initEnemiesPositions.initEnemiesPositions)(enemies)
+  "food": _InitFoodPositions.FoodPositions.init(food),
+  "enemies": _InitEnemiesPositions.EnemiesPositions.init(enemies)
 };
 
 io.on('connection', function (socket) {
-  (0, _newPlayer.newPlayer)(socket, state);
+  _NewPlayer.Player.new(socket, state);
 
   socket.on('disconnect', function () {
     delete state.players[socket.id];
@@ -272,9 +317,9 @@ io.on('connection', function (socket) {
 
   socket.on('movement', function (data) {
     var player = state.players[socket.id] || {};
-    (0, _enemiesMove.move)(data.x, data.y, player);
-    (0, _canEat.checkEaten)(socket, state, food, enemies);
-    (0, _enemiesMove.enemiesMove)(state);
+    _EnemiesMove.Motion.playerMove(data.x, data.y, player);
+    _CanEat.Eating.check(socket, state, food, enemies);
+    _EnemiesMove.Motion.enemy(state);
   });
 });
 
@@ -293,66 +338,83 @@ setInterval(function () {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.checkEaten = checkEaten;
+exports.Eating = undefined;
 
-var _rebirth = __webpack_require__(1);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _initFoodPositions = __webpack_require__(2);
+var _Rebirth = __webpack_require__(1);
 
-var _initEnemiesPositions = __webpack_require__(3);
+var _InitFoodPositions = __webpack_require__(2);
 
-var _config = __webpack_require__(0);
+var _InitEnemiesPositions = __webpack_require__(3);
 
-function checkEaten(socket, state, food, enemies) {
-  for (var i = 0; i < _config.MAX_FOOD_NUMBER; i++) {
-    for (var j = 0; j < _config.MAX_ENEMY_NUMBER; j++) {
-      for (var g in state.players) {
-        if (canEat(state.players[g], state.food[i]) || canEat(state.enemies[j], state.food[i])) {
-          state.food.splice(i, 1);
-          (0, _initFoodPositions.initFoodPositions)(food);
-        }
-        if (canEat(state.enemies[j], state.players[g])) {
-          (0, _rebirth.rebirth)(g, state);
-        } else if (canEat(state.players[g], state.enemies[j])) {
-          state.enemies.splice(j, 1);
-          (0, _initEnemiesPositions.initEnemiesPositions)(enemies);
-        }
-        for (var k in state.players) {
-          if (canEat(state.players[k], state.players[g])) {
-            (0, _rebirth.rebirth)(g, state);
+var _Config = __webpack_require__(0);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Eating = exports.Eating = function () {
+  function Eating() {
+    _classCallCheck(this, Eating);
+  }
+
+  _createClass(Eating, null, [{
+    key: 'check',
+    value: function check(socket, state, food, enemies) {
+      for (var i = 0; i < _Config.MAX_FOOD_NUMBER; i++) {
+        for (var j = 0; j < _Config.MAX_ENEMY_NUMBER; j++) {
+          for (var g in state.players) {
+            if (this._canEat(state.players[g], state.food[i]) || this._canEat(state.enemies[j], state.food[i])) {
+              state.food.splice(i, 1);
+              _InitFoodPositions.FoodPositions.init(food);
+            }
+            if (this._canEat(state.enemies[j], state.players[g])) {
+              _Rebirth.Make.rebirth(g, state);
+            } else if (this._canEat(state.players[g], state.enemies[j])) {
+              state.enemies.splice(j, 1);
+              _InitEnemiesPositions.EnemiesPositions.init(enemies);
+            }
+            for (var k in state.players) {
+              if (this._canEat(state.players[k], state.players[g])) {
+                _Rebirth.Make.rebirth(g, state);
+              }
+            }
+          }
+          for (var _k = 0; _k != _Config.MAX_ENEMY_NUMBER; _k++) {
+            if (this._canEat(state.enemies[_k], state.enemies[j])) {
+              state.enemies.splice(j, 1);
+              _InitEnemiesPositions.EnemiesPositions.init(enemies);
+            } else if (this._canEat(state.enemies[j], state.enemies[_k])) {
+              state.enemies.splice(_k, 1);
+              _InitEnemiesPositions.EnemiesPositions.init(enemies);
+            }
           }
         }
       }
-      for (var _k = 0; _k != _config.MAX_ENEMY_NUMBER; _k++) {
-        if (canEat(state.enemies[_k], state.enemies[j])) {
-          state.enemies.splice(j, 1);
-          (0, _initEnemiesPositions.initEnemiesPositions)(enemies);
-        } else if (canEat(state.enemies[j], state.enemies[_k])) {
-          state.enemies.splice(_k, 1);
-          (0, _initEnemiesPositions.initEnemiesPositions)(enemies);
-        }
+    }
+  }, {
+    key: '_canEat',
+    value: function _canEat(predator, victim) {
+      if (predator.width > victim.width && this._checkCollision(predator, victim) == true) {
+        return true;
       }
     }
-  }
-}
-
-function checkCollision(predator, victim) {
-  if (predator.x - predator.width / 2 - victim.width / 2 < victim.x && victim.x < predator.x + predator.width / 2 + victim.width / 2 && predator.y - predator.height - victim.height < victim.y && victim.y < predator.y + predator.height + victim.height) {
-    predator.width = predator.width + victim.width * victim.width;
-    predator.height = predator.height + victim.height * victim.width;
-    predator.radius = predator.radius + victim.radius * victim.width;
-    if (predator.acceleration > _config.LOW_ACCELERATION) {
-      predator.acceleration = predator.acceleration - predator.acceleration * victim.width;
+  }, {
+    key: '_checkCollision',
+    value: function _checkCollision(predator, victim) {
+      if (predator.x - predator.width / 2 - victim.width / 2 < victim.x && victim.x < predator.x + predator.width / 2 + victim.width / 2 && predator.y - predator.height - victim.height < victim.y && victim.y < predator.y + predator.height + victim.height) {
+        predator.width = predator.width + victim.width * victim.width;
+        predator.height = predator.height + victim.height * victim.width;
+        predator.radius = predator.radius + victim.radius * victim.width;
+        if (predator.acceleration > _Config.LOW_ACCELERATION) {
+          predator.acceleration = predator.acceleration - predator.acceleration * victim.width;
+        }
+        return true;
+      }
     }
-    return true;
-  }
-}
+  }]);
 
-function canEat(predator, victim) {
-  if (predator.width > victim.width && checkCollision(predator, victim) == true) {
-    return true;
-  }
-}
+  return Eating;
+}();
 
 /***/ }),
 /* 6 */
@@ -364,72 +426,93 @@ function canEat(predator, victim) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.enemiesMove = enemiesMove;
-exports.move = move;
+exports.Motion = undefined;
 
-var _config = __webpack_require__(0);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function enemiesMove(state) {
-  for (var j = 0; j < _config.MAX_ENEMY_NUMBER; j++) {
-    for (var g in state.players) {
-      if (radiusVisibility(state.players[g], state.enemies[j], _config.CONVERGENCE_RADIUS)) {
-        move(state.players[g].x, state.players[g].y, state.enemies[j]);
-      } else {
-        move(findNearestFoodCoordinate(state.enemies[j], state).x, findNearestFoodCoordinate(state.enemies[j], state).y, state.enemies[j]);
+var _Config = __webpack_require__(0);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Motion = exports.Motion = function () {
+  function Motion() {
+    _classCallCheck(this, Motion);
+  }
+
+  _createClass(Motion, null, [{
+    key: 'enemy',
+    value: function enemy(state) {
+      for (var j = 0; j < _Config.MAX_ENEMY_NUMBER; j++) {
+        for (var g in state.players) {
+          if (this._radiusVisibility(state.players[g], state.enemies[j], _Config.CONVERGENCE_RADIUS)) {
+            this.playerMove(state.players[g].x, state.players[g].y, state.enemies[j]);
+          } else {
+            this.playerMove(this._findNearestFoodCoordinate(state.enemies[j], state).x, this._findNearestFoodCoordinate(state.enemies[j], state).y, state.enemies[j]);
+          }
+        }
       }
     }
-  }
-}
-
-function move(coordX, coordY, obj) {
-  var xDistance = coordX - obj.x;
-  var yDistance = coordY - obj.y;
-  var distance = Math.sqrt(xDistance * xDistance + yDistance * yDistance);
-  if (distance > 0) {
-    obj.x += xDistance * obj.acceleration;
-    obj.y += yDistance * obj.acceleration;
-  }
-}
-
-function findNearestFoodCoordinate(enemy, state) {
-  var coordinate_x = 1;
-  var coordinate_y = 1;
-  var newCoordinate_x = 0;
-  var newCoordinate_y = 0;
-  var numberNearestFood = 0;
-  for (var i = 0; i != _config.MAX_FOOD_NUMBER; i++) {
-    newCoordinate_x = Math.abs(enemy.x - state.food[i].x);
-    newCoordinate_y = Math.abs(enemy.y - state.food[i].y);
-    if (newCoordinate_x < coordinate_x && newCoordinate_y < coordinate_y) {
-      coordinate_x = newCoordinate_x;
-      coordinate_y = newCoordinate_y;
-      numberNearestFood = i;
+  }, {
+    key: 'playerMove',
+    value: function playerMove(coordX, coordY, obj) {
+      var xDistance = coordX - obj.x;
+      var yDistance = coordY - obj.y;
+      var distance = Math.sqrt(xDistance * xDistance + yDistance * yDistance);
+      if (distance > 0) {
+        obj.x += xDistance * obj.acceleration;
+        obj.y += yDistance * obj.acceleration;
+      }
     }
-    if (i == _config.MAX_FOOD_NUMBER - 1) {
-      return { x: state.food[numberNearestFood].x, y: state.food[numberNearestFood].y };
+  }, {
+    key: '_findNearestFoodCoordinate',
+    value: function _findNearestFoodCoordinate(enemy, state) {
+      var coordinate_x = 1;
+      var coordinate_y = 1;
+      var newCoordinate_x = 0;
+      var newCoordinate_y = 0;
+      var numberNearestFood = 0;
+      for (var i = 0; i != _Config.MAX_FOOD_NUMBER; i++) {
+        newCoordinate_x = Math.abs(enemy.x - state.food[i].x);
+        newCoordinate_y = Math.abs(enemy.y - state.food[i].y);
+        if (newCoordinate_x < coordinate_x && newCoordinate_y < coordinate_y) {
+          coordinate_x = newCoordinate_x;
+          coordinate_y = newCoordinate_y;
+          numberNearestFood = i;
+        }
+        if (i == _Config.MAX_FOOD_NUMBER - 1) {
+          return { x: state.food[numberNearestFood].x, y: state.food[numberNearestFood].y };
+        }
+      }
     }
-  }
-}
+  }, {
+    key: '_radiusVisibility',
+    value: function _radiusVisibility(first_obj, second_obj, radius) {
+      return (this._positionRight(first_obj, second_obj, radius) || this._positionLeft(first_obj, second_obj, radius)) && (this._positionDown(first_obj, second_obj, radius) || this._positionUp(first_obj, second_obj, radius));
+    }
+  }, {
+    key: '_positionRight',
+    value: function _positionRight(first_obj, second_obj, radius) {
+      if (first_obj.x - second_obj.x <= radius && first_obj.x + second_obj.width / 2 - second_obj.x > 0) return true;
+    }
+  }, {
+    key: '_positionLeft',
+    value: function _positionLeft(first_obj, second_obj, radius) {
+      if (second_obj.x - first_obj.x <= radius && second_obj.x + second_obj.width / 2 - first_obj.x > 0) return true;
+    }
+  }, {
+    key: '_positionUp',
+    value: function _positionUp(first_obj, second_obj, radius) {
+      if (second_obj.y - first_obj.y < radius && second_obj.y + second_obj.height / 2 - first_obj.y > 0) return true;
+    }
+  }, {
+    key: '_positionDown',
+    value: function _positionDown(first_obj, second_obj, radius) {
+      if (first_obj.y - second_obj.y < radius && first_obj.y + second_obj.height / 2 - second_obj.y > 0) return true;
+    }
+  }]);
 
-function radiusVisibility(first_obj, second_obj, radius) {
-  return (positionRight(first_obj, second_obj, radius) || positionLeft(first_obj, second_obj, radius)) && (positionDown(first_obj, second_obj, radius) || positionUp(first_obj, second_obj, radius));
-}
-
-function positionRight(first_obj, second_obj, radius) {
-  if (first_obj.x - second_obj.x <= radius && first_obj.x + second_obj.width / 2 - second_obj.x > 0) return true;
-}
-
-function positionLeft(first_obj, second_obj, radius) {
-  if (second_obj.x - first_obj.x <= radius && second_obj.x + second_obj.width / 2 - first_obj.x > 0) return true;
-}
-
-function positionUp(first_obj, second_obj, radius) {
-  if (second_obj.y - first_obj.y < radius && second_obj.y + second_obj.height / 2 - first_obj.y > 0) return true;
-}
-
-function positionDown(first_obj, second_obj, radius) {
-  if (first_obj.y - second_obj.y < radius && first_obj.y + second_obj.height / 2 - second_obj.y > 0) return true;
-}
+  return Motion;
+}();
 
 /***/ }),
 /* 7 */
@@ -441,16 +524,31 @@ function positionDown(first_obj, second_obj, radius) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.newPlayer = newPlayer;
+exports.Player = undefined;
 
-var _rebirth = __webpack_require__(1);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function newPlayer(socket, state) {
-  socket.on('new player', function () {
-    (0, _rebirth.rebirth)(socket.id, state);
-    socket.emit("player_created", state.players[socket.id]);
-  });
-}
+var _Rebirth = __webpack_require__(1);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Player = exports.Player = function () {
+  function Player() {
+    _classCallCheck(this, Player);
+  }
+
+  _createClass(Player, null, [{
+    key: 'new',
+    value: function _new(socket, state) {
+      socket.on('new player', function () {
+        _Rebirth.Make.rebirth(socket.id, state);
+        socket.emit("player_created", state.players[socket.id]);
+      });
+    }
+  }]);
+
+  return Player;
+}();
 
 /***/ }),
 /* 8 */

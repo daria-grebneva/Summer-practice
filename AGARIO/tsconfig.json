@@ -5,10 +5,11 @@
     "outFile": "./static/bin/build/bundle.js"
   },
   "files": [
-    "./src/game.ts"
+    "./src/client/game.ts"
   ],
   "include": [
     "./src/**/*"
   ]
 }
+
 
