@@ -1,51 +1,51 @@
 'use strict';
-import {Make} from './Rebirth';
-import {FoodPositions} from './InitFoodPositions';
-import {EnemiesPositions} from './InitEnemiesPositions';
+import {MovementController} from './MovementController';
 import {MAX_FOOD_NUMBER, MAX_ENEMY_NUMBER, LOW_ACCELERATION} from './Config';
 
-export class Eating {
-  static check(socket, state, food, enemies) {
+const movementController = new MovementController();
+
+export class CollisionChecker {
+    check(socket, state, food, enemies) {
     for (let i = 0; i < MAX_FOOD_NUMBER; i++) {
       for (let j = 0; j < MAX_ENEMY_NUMBER; j++) {
         for (let g in state.players) {
           if (this._canEat(state.players[g], state.food[i]) || this._canEat(state.enemies[j], state.food[i])) {
             state.food.splice(i, 1);
-            FoodPositions.init(food);
+            movementController.foodPositions(food);
           }
           if (this._canEat(state.enemies[j], state.players[g])) {
-            Make.rebirth(g, state);
+            movementController.playersPositions(g, state);
           }
           else if (this._canEat(state.players[g], state.enemies[j])) {
             state.enemies.splice(j, 1);
-            EnemiesPositions.init(enemies);
+            movementController.enemiesPositions(enemies);
           }
           for (let k in state.players) {
             if (this._canEat(state.players[k], state.players[g])) {
-              Make.rebirth(g, state);
+              movementController.playersPositions(g, state);
             }
           }
         }
         for (let k = 0; k != MAX_ENEMY_NUMBER; k++) {
           if (this._canEat(state.enemies[k], state.enemies[j])) {
             state.enemies.splice(j, 1);
-            EnemiesPositions.init(enemies);
+            movementController.enemiesPositions(enemies);
           } else if (this._canEat(state.enemies[j], state.enemies[k])) {
             state.enemies.splice(k, 1);
-            EnemiesPositions.init(enemies);
+            movementController.enemiesPositions(enemies);
           }
         }
       }
     }
   }
 
-  static _canEat(predator, victim) {
+  _canEat(predator, victim) {
     if ((predator.width > victim.width) && (this._checkCollision(predator, victim) == true)) {
       return true
     }
   }
 
-  static _checkCollision(predator, victim) {
+  _checkCollision(predator, victim) {
     if (((predator.x - predator.width / 2 - victim.width / 2) < victim.x
       && victim.x < (predator.x + predator.width / 2 + victim.width / 2))
       && ((predator.y - predator.height - victim.height) < victim.y

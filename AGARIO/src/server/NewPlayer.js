@@ -1,10 +1,11 @@
 'use strict';
-import {Make} from './Rebirth';
+import {MovementController} from './MovementController';
+const movementController = new MovementController();
 
-export class Player {
-  static new(socket, state) {
+export class NewPlayer {
+  static create(socket, state) {
     socket.on('new player', function () {
-      Make.rebirth(socket.id, state);
+      movementController.playersPositions(socket.id, state);
       socket.emit("player_created", state.players[socket.id]);
     });
   }

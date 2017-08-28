@@ -230,8 +230,8 @@ define("Painter", ["require", "exports", "Player", "Food", "Config"], function (
                 this.context.fill();
                 this.context.fillStyle = 'black';
                 this.context.font = this.other_players.width * this.canvas.width / 1.5 + 'px lobster';
-                var width = Math.round(this.other_players.width * 1000000000) / 10000000;
-                this.context.fillText(String(width), (this.other_players.x - this.other_players.width) * this.canvas.width, (this.other_players.y + this.other_players.height / 2) * this.canvas.height);
+                var width = Math.round(this.other_players.width * 10000) / 100;
+                this.context.fillText(String(width), (this.other_players.x - this.other_players.width / 2) * this.canvas.width, (this.other_players.y + this.other_players.height / 2) * this.canvas.height);
             }
         };
         Painter.prototype._drawFood = function () {
@@ -251,8 +251,8 @@ define("Painter", ["require", "exports", "Player", "Food", "Config"], function (
                 this.context.fill();
                 this.context.fillStyle = 'black';
                 this.context.font = enemy.width * this.canvas.width / 1.5 + 'px lobster';
-                var width = Math.round(enemy.width * 1000000000) / 10000000;
-                this.context.fillText(String(width), (enemy.x - enemy.width) * this.canvas.width, (enemy.y + enemy.height / 2) * this.canvas.height);
+                var width = Math.round(enemy.width * 10000) / 100;
+                this.context.fillText(String(width), (enemy.x - enemy.width / 2) * this.canvas.width, (enemy.y + enemy.height / 2) * this.canvas.height);
             }
         };
         Painter.prototype._gameCameraCoordinates = function () {
