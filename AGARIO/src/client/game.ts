@@ -11,7 +11,6 @@ class Game {
     private start: boolean;
     private field: Field;
     private player: Player;
-    private other_players: Player;
     private canvas: HTMLCanvasElement;
     private context: CanvasRenderingContext2D;
     private state = {
@@ -27,10 +26,7 @@ class Game {
     };
     private movement = {
         x: 0,
-        y: 0,
-        width: 0,
-        height: 0,
-        radius: 0,
+        y: 0
     };
     private draw: Painter;
 

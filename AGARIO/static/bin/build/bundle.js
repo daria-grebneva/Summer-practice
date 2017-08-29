@@ -283,10 +283,7 @@ define("game", ["require", "exports", "Field", "Player", "Painter", "Config"], f
             };
             this.movement = {
                 x: 0,
-                y: 0,
-                width: 0,
-                height: 0,
-                radius: 0,
+                y: 0
             };
             this.start = false;
             this.canvas = document.getElementById('canvas');
