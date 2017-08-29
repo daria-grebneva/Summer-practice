@@ -1,7 +1,7 @@
 import {Player} from "./Player";
 import {Food} from "./Food";
 import {Field} from "./Field";
-import {FIELD_COLOR, FONT_COLOR, CANVAS_SCALE, /*X_REVIEW, Y_REVIEW, */RESIZE_COEF} from "./Config";
+import {FIELD_COLOR, FONT_COLOR, CANVAS_SCALE, RESIZE_COEF} from "./Config";
 
 export class Painter {
     private canvas: HTMLCanvasElement;
@@ -44,14 +44,15 @@ export class Painter {
         this.start = start;
         this.context.setTransform(1, 0, 0, 1, 0, 0);
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        let X_REVIEW = this.canvas.width / RESIZE_COEF;
-        let Y_REVIEW = this.canvas.height / RESIZE_COEF;
-        this.context.setTransform(X_REVIEW / this.canvas.width, 0, 0, Y_REVIEW / this.canvas.height, this._gameCameraCoordinates().x, this._gameCameraCoordinates().y);
+        let xReview = this.canvas.width / RESIZE_COEF;
+        let yReview = this.canvas.height / RESIZE_COEF;
+        this.context.setTransform(xReview / this.canvas.width, 0, 0, yReview / this.canvas.height, this._gameCameraCoordinates().x, this._gameCameraCoordinates().y);
         this.field.draw(this.context);
-        this._drawFood();
-        this._drawPlayers();
-        this._drawEnemies();
-        if (!this.start) {
+        if (this.start) {
+            this._drawFood();
+            this._drawPlayers();
+            this._drawEnemies();
+        } else {
             this._drawWallpaper();
         }
     }
@@ -79,7 +80,7 @@ export class Painter {
             this.context.fill();
             this.context.fillStyle = 'black';
             this.context.font = this.other_players.width * this.canvas.width / 1.5 + 'px lobster';
-            let width =  Math.round(this.other_players.width * 10000) / 100;
+            let width = Math.round(this.other_players.width * 10000) / 100;
             this.context.fillText(String(width), (this.other_players.x - this.other_players.width / 2) * this.canvas.width, (this.other_players.y + this.other_players.height / 2) * this.canvas.height);
         }
     }
@@ -102,7 +103,7 @@ export class Painter {
             this.context.fill();
             this.context.fillStyle = 'black';
             this.context.font = enemy.width * this.canvas.width / 1.5 + 'px lobster';
-            let width =  Math.round(enemy.width * 10000) / 100;
+            let width = Math.round(enemy.width * 10000) / 100;
             this.context.fillText(String(width), (enemy.x - enemy.width / 2) * this.canvas.width, (enemy.y + enemy.height / 2) * this.canvas.height);
         }
     }

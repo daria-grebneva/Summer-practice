@@ -152,10 +152,6 @@ define("Config", ["require", "exports"], function (require, exports) {
     exports.FONT_COLOR = FONT_COLOR;
     var CANVAS_SCALE = 55;
     exports.CANVAS_SCALE = CANVAS_SCALE;
-    var X_REVIEW = 3800;
-    exports.X_REVIEW = X_REVIEW;
-    var Y_REVIEW = 1840;
-    exports.Y_REVIEW = Y_REVIEW;
     var RESIZE_COEF = 0.505;
     exports.RESIZE_COEF = RESIZE_COEF;
 });
@@ -197,14 +193,16 @@ define("Painter", ["require", "exports", "Player", "Food", "Config"], function (
             this.start = start;
             this.context.setTransform(1, 0, 0, 1, 0, 0);
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            var X_REVIEW = this.canvas.width / Config_1.RESIZE_COEF;
-            var Y_REVIEW = this.canvas.height / Config_1.RESIZE_COEF;
-            this.context.setTransform(X_REVIEW / this.canvas.width, 0, 0, Y_REVIEW / this.canvas.height, this._gameCameraCoordinates().x, this._gameCameraCoordinates().y);
+            var xReview = this.canvas.width / Config_1.RESIZE_COEF;
+            var yReview = this.canvas.height / Config_1.RESIZE_COEF;
+            this.context.setTransform(xReview / this.canvas.width, 0, 0, yReview / this.canvas.height, this._gameCameraCoordinates().x, this._gameCameraCoordinates().y);
             this.field.draw(this.context);
-            this._drawFood();
-            this._drawPlayers();
-            this._drawEnemies();
-            if (!this.start) {
+            if (this.start) {
+                this._drawFood();
+                this._drawPlayers();
+                this._drawEnemies();
+            }
+            else {
                 this._drawWallpaper();
             }
         };

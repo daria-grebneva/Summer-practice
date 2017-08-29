@@ -237,8 +237,6 @@ var LOW_ACCELERATION = 0.0045;
 var FIELD_COLOR = 'rgba(238, 238, 254, 0.8)';
 var FONT_COLOR = '#937cdd';
 var CANVAS_SCALE = 55;
-var X_REVIEW = 3800;
-var Y_REVIEW = 1840;
 var RESIZE_COEF = 0.505;
 exports.MAX_FOOD_NUMBER = MAX_FOOD_NUMBER;
 exports.SMALL_BALL_SIZE = SMALL_BALL_SIZE;
@@ -255,8 +253,6 @@ exports.LOW_ACCELERATION = LOW_ACCELERATION;
 exports.FIELD_COLOR = FIELD_COLOR;
 exports.FONT_COLOR = FONT_COLOR;
 exports.CANVAS_SCALE = CANVAS_SCALE;
-exports.X_REVIEW = X_REVIEW;
-exports.Y_REVIEW = Y_REVIEW;
 exports.RESIZE_COEF = RESIZE_COEF;
 
 /***/ }),
@@ -322,7 +318,6 @@ io.on('connection', function (socket) {
 setInterval(function () {
   io.sockets.emit('state', state);
 }, 1000 / 60);
-//TODO :: узнать, почему притормаживает если поиграть??
 
 /***/ }),
 /* 3 */

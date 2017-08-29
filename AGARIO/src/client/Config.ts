@@ -7,8 +7,6 @@ const PLAYER_ACCELERATION = 0.09;
 const FIELD_COLOR = 'rgba(238, 238, 254, 0.8)';
 const FONT_COLOR = '#937cdd';
 const CANVAS_SCALE = 55;
-let X_REVIEW = 3800;
-let Y_REVIEW = 1840;
 const RESIZE_COEF = 0.505;
 export {
     PLAYER_SIZE,
@@ -19,7 +17,5 @@ export {
     FIELD_COLOR,
     FONT_COLOR,
     CANVAS_SCALE,
-    X_REVIEW,
-    Y_REVIEW,
     RESIZE_COEF
 }
