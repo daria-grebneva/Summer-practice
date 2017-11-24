@@ -2,6 +2,7 @@
 const MAX_FOOD_NUMBER = 40;
 const SMALL_BALL_SIZE = 7 / 2000;
 const SMALL_BALL_RADIUS = 2 / 700;
+const MAX_RADIUS = 300 / 2000;
 
 const PLAYER_SIZE = 10 / 2000;
 const PLAYER_RADIUS = 5 / 700;
@@ -19,6 +20,12 @@ const FIELD_COLOR = 'rgba(238, 238, 254, 0.8)';
 const FONT_COLOR = '#937cdd';
 const CANVAS_SCALE = 55;
 const RESIZE_COEF = 0.505;
+const KEY_MOVEMENT = "m";
+const KEY_NEW_PLAYER = "n";
+const KEY_UPDATE_DATA = "u";
+const KEY_FOOD = "f";
+const KEY_PLAYERS = "p";
+const KEY_ENEMIES = "e";
 export {
   MAX_FOOD_NUMBER,
   SMALL_BALL_SIZE,
@@ -35,5 +42,12 @@ export {
   FIELD_COLOR,
   FONT_COLOR,
   CANVAS_SCALE,
-  RESIZE_COEF
+  RESIZE_COEF,
+  MAX_RADIUS,
+  KEY_MOVEMENT,
+  KEY_NEW_PLAYER,
+  KEY_UPDATE_DATA,
+  KEY_FOOD,
+  KEY_PLAYERS,
+  KEY_ENEMIES
 }

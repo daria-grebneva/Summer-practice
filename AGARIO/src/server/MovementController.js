@@ -10,24 +10,44 @@ import {
   ENEMY_ACCELERATION,
   PLAYER_RADIUS,
   PLAYER_SIZE,
-  PLAYER_ACCELERATION
+  PLAYER_ACCELERATION,
+  KEY_FOOD,
+  KEY_PLAYERS,
+  KEY_ENEMIES
 } from './Config';
 import {Utils} from './Utils';
 
 export class MovementController {
   moveEnemy(state) {
     for (let j = 0; j < MAX_ENEMY_NUMBER; j++) {
-      for (let g in state.players) {
-        if (this._radiusVisibility(state.players[g], state.enemies[j], CONVERGENCE_RADIUS)) {
-          this.movePlayer(state.players[g].x, state.players[g].y, state.enemies[j])
+      for (let g of Object.keys(state[KEY_PLAYERS])) {
+
+        if (this._radiusVisibility(state[KEY_PLAYERS][g], state[KEY_ENEMIES][j], CONVERGENCE_RADIUS)) {
+          this.movePlayer(state[KEY_PLAYERS][g].x, state[KEY_PLAYERS][g].y, state[KEY_ENEMIES][j])
         } else {
-          this.movePlayer(this._findNearestFoodCoordinate(state.enemies[j], state).x, this._findNearestFoodCoordinate(state.enemies[j], state).y, state.enemies[j])
+          this.movePlayer(this._findNearestFoodCoordinate(state[KEY_ENEMIES][j], state).x, this._findNearestFoodCoordinate(state[KEY_ENEMIES][j], state).y, state[KEY_ENEMIES][j])
         }
       }
     }
   }
 
+  checkBorder(coord) {
+    let newCoord;
+    if (coord < 0) {
+      newCoord = 0;
+    }
+    else if (coord > 1) {
+      newCoord = 1;
+    }
+    else {
+      newCoord = coord;
+    }
+    return newCoord;
+  }
+
   movePlayer(coordX, coordY, obj) {
+    coordX = this.checkBorder(coordX);
+    coordY = this.checkBorder(coordY);
     let xDistance = coordX - obj.x;
     let yDistance = coordY - obj.y;
     let distance = Math.sqrt(xDistance * xDistance + yDistance * yDistance);
@@ -52,7 +72,7 @@ export class MovementController {
   }
 
   enemiesPositions(enemies) {
-    for (let i = 0; MAX_ENEMY_NUMBER - enemies.length > 0; i++) {
+    for (let i = 0; MAX_ENEMY_NUMBER - enemies.length >= 1; i++) {
       enemies.push({
         x: Utils.randomCoordinates(0, 1),
         y: Utils.randomCoordinates(0, 1),
@@ -67,7 +87,7 @@ export class MovementController {
   }
 
   playersPositions(id, state) {
-    state.players[id] = {
+    state[KEY_PLAYERS][id] = {
       x: Utils.randomCoordinates(0, 1),
       y: Utils.randomCoordinates(0, 1),
       radius: PLAYER_RADIUS,
@@ -86,15 +106,15 @@ export class MovementController {
     let newCoordinate_y = 0;
     let numberNearestFood = 0;
     for (let i = 0; i != MAX_FOOD_NUMBER; i++) {
-      newCoordinate_x = Math.abs(enemy.x - state.food[i].x);
-      newCoordinate_y = Math.abs(enemy.y - state.food[i].y);
+      newCoordinate_x = Math.abs(enemy.x - state[KEY_FOOD][i].x);
+      newCoordinate_y = Math.abs(enemy.y - state[KEY_FOOD][i].y);
       if ((newCoordinate_x < coordinate_x) && (newCoordinate_y < coordinate_y)) {
         coordinate_x = newCoordinate_x;
         coordinate_y = newCoordinate_y;
         numberNearestFood = i;
       }
       if (i == MAX_FOOD_NUMBER - 1) {
-        return {x: state.food[numberNearestFood].x, y: state.food[numberNearestFood].y}
+        return {x: state[KEY_FOOD][numberNearestFood].x, y: state[KEY_FOOD][numberNearestFood].y}
       }
     }
   }
@@ -105,22 +125,22 @@ export class MovementController {
   }
 
   _positionRight(first_obj, second_obj, radius) {
-    if ((first_obj.x - second_obj.x) <= radius && (first_obj.x + second_obj.width / 2 - second_obj.x) > 0)
+    if ((first_obj.x - second_obj.x) <= radius && (first_obj.x + second_obj.radius / 2 - second_obj.x) > 0)
       return true;
   }
 
   _positionLeft(first_obj, second_obj, radius) {
-    if ((second_obj.x - first_obj.x) <= radius && (second_obj.x + second_obj.width / 2 - first_obj.x) > 0)
+    if ((second_obj.x - first_obj.x) <= radius && (second_obj.x + second_obj.radius / 2 - first_obj.x) > 0)
       return true;
   }
 
   _positionUp(first_obj, second_obj, radius) {
-    if ((second_obj.y - first_obj.y) < radius && (second_obj.y + second_obj.height / 2 - first_obj.y) > 0)
+    if ((second_obj.y - first_obj.y) < radius && (second_obj.y + second_obj.radius / 2 - first_obj.y) > 0)
       return true;
   }
 
   _positionDown(first_obj, second_obj, radius) {
-    if ((first_obj.y - second_obj.y) < radius && (first_obj.y + second_obj.height / 2 - second_obj.y) > 0)
+    if ((first_obj.y - second_obj.y) < radius && (first_obj.y + second_obj.radius / 2 - second_obj.y) > 0)
       return true;
   }
 }

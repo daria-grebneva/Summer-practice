@@ -1,14 +1,23 @@
 {
   "compilerOptions": {
     "module": "amd",
-    "target": "es5",
-    "outFile": "./static/bin/build/bundle.js"
+    "target": "es6",
+    "outFile": "./static/bin/build/bundle.js",
+    "types": [
+      "node"
+    ],
+    "typeRoots": [
+      "node_modules/@types"
+    ]
   },
   "files": [
     "./src/client/game.ts"
   ],
   "include": [
     "./src/**/*"
+  ],
+  "define": [
+    "socket.io"
   ]
 }
 

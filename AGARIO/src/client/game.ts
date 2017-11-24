@@ -3,7 +3,8 @@ import {Player} from "./Player";
 import {Painter} from "./Painter"
 import {PLAYER_SIZE, PLAYER_RADIUS, PLAYER_COLOR, BACKGROUND_COLOR, PLAYER_ACCELERATION} from "./Config";
 
-//let io = require('socket.io');
+/*declare const require: any;
+const io = require('socket.io-client');*/
 let socket = io();
 
 class Game {
@@ -40,7 +41,7 @@ class Game {
         this.player = new Player(this.context, this.canvas, this.canvas.width / 2, this.canvas.height / 2, PLAYER_SIZE, PLAYER_SIZE, PLAYER_COLOR, PLAYER_RADIUS, PLAYER_ACCELERATION);
 
         this.draw = new Painter();
-        socket.emit('new player');
+        socket.emit('new_player');
 
         this.canvas.onclick = (event) => {
             this.start = true;
@@ -48,19 +49,21 @@ class Game {
         };
 
         socket.on("player_created", () => {
-            socket.on('state', (state) => {
-                this.state.players = state.players;
-                this.state.food = state.food;
-                this.state.food_length = state.food.length;
-                for (let i = 0; i < this.state.food_length; i++) {
-                    this.state.food_width = state.food[i].width;
-                    this.state.food_radius = state.food[i].radius;
+            socket.on('update_data', (state) => {
+                let newState = JSON.parse(state);
+                this.state.players = newState.players;
+                this.state.food = newState["food"];
+                this.state.food_length = newState.food.length;
+                for (let j = 0; j < this.state.food_length; j++) {
+                    this.state.food_width = newState["food"][j]["width"];
+                    this.state.food_radius = newState["food"][j]["radius"];
+                    console.log(this.state.food_width);
                 }
-                this.state.enemies = state.enemies;
-                this.state.enemies_length = state.enemies.length;
+                this.state.enemies = newState["enemies"];
+                this.state.enemies_length = newState["enemies"]["length"];
                 for (let i = 0; i < this.state.enemies_length; i++) {
-                    this.state.enemies_width = state.enemies[i].width;
-                    this.state.enemies_radius = state.enemies[i].radius;
+                    this.state.enemies_width = newState["enemies"][i]["width"];
+                    this.state.enemies_radius = newState["enemies"][i]["radius"];
                 }
             });
         });
@@ -75,14 +78,14 @@ class Game {
     }
 
     _update() {
-        socket.emit('movement', this.movement);
         this._mouseCoordinates();
     }
 
     _mouseCoordinates() {
         addEventListener("mousemove", (event) => {
-            this.movement.x = (event.offsetX / this.canvas.clientWidth);
-            this.movement.y = (event.offsetY / this.canvas.clientHeight);
+            this.movement["x"] = (event.offsetX / this.canvas.clientWidth);
+            this.movement["y"] = (event.offsetY / this.canvas.clientHeight);
+            socket.emit('movement', JSON.stringify(this.movement));
         });
     }
 

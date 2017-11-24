@@ -1,18 +1,8 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 define("Shape", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var Shape = (function () {
-        function Shape(context, canvas, scaledX, scaledY, scaledWidth, scaledHeight, color) {
+    class Shape {
+        constructor(context, canvas, scaledX, scaledY, scaledWidth, scaledHeight, color) {
             this.canvas = canvas;
             this.x = scaledX;
             this.y = scaledY;
@@ -20,146 +10,113 @@ define("Shape", ["require", "exports"], function (require, exports) {
             this.height = scaledHeight;
             this.color = color;
         }
-        Object.defineProperty(Shape.prototype, "scaledX", {
-            get: function () {
-                return this.x * this.canvas.width;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Shape.prototype, "scaledY", {
-            get: function () {
-                return this.y * this.canvas.height;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Shape.prototype, "scaledWidth", {
-            get: function () {
-                return this.width * this.canvas.width;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Shape.prototype, "scaledHeight", {
-            get: function () {
-                return this.height * this.canvas.height;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return Shape;
-    }());
+        get scaledX() {
+            return this.x * this.canvas.width;
+        }
+        get scaledY() {
+            return this.y * this.canvas.height;
+        }
+        get scaledWidth() {
+            return this.width * this.canvas.width;
+        }
+        get scaledHeight() {
+            return this.height * this.canvas.height;
+        }
+    }
     exports.Shape = Shape;
 });
 define("Rectangle", ["require", "exports", "Shape"], function (require, exports, Shape_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var Rectangle = (function (_super) {
-        __extends(Rectangle, _super);
-        function Rectangle(context, canvas, scaledX, scaledY, scaledWidth, scaledHeight, color) {
-            return _super.call(this, context, canvas, scaledX, scaledY, scaledWidth, scaledHeight, color) || this;
+    class Rectangle extends Shape_1.Shape {
+        constructor(context, canvas, scaledX, scaledY, scaledWidth, scaledHeight, color) {
+            super(context, canvas, scaledX, scaledY, scaledWidth, scaledHeight, color);
         }
-        Rectangle.prototype.draw = function (context) {
+        draw(context) {
             context.fillStyle = this.color;
             context.fillRect(this.scaledX, this.scaledY, this.scaledWidth, this.scaledHeight);
-        };
-        return Rectangle;
-    }(Shape_1.Shape));
+        }
+    }
     exports.Rectangle = Rectangle;
 });
 define("Field", ["require", "exports", "Rectangle"], function (require, exports, Rectangle_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var Field = (function (_super) {
-        __extends(Field, _super);
-        function Field(context, canvas, _x, _y, _width, _height, color) {
-            return _super.call(this, context, canvas, _x, _y, _width, _height, color) || this;
+    class Field extends Rectangle_1.Rectangle {
+        constructor(context, canvas, _x, _y, _width, _height, color) {
+            super(context, canvas, _x, _y, _width, _height, color);
         }
-        return Field;
-    }(Rectangle_1.Rectangle));
+    }
     exports.Field = Field;
 });
 define("Circle", ["require", "exports", "Shape"], function (require, exports, Shape_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var Circle = (function (_super) {
-        __extends(Circle, _super);
-        function Circle(context, canvas, _x, _y, _width, _height, color, scaledRadius) {
-            var _this = _super.call(this, context, canvas, _x, _y, _width, _height, color) || this;
-            _this.radius = scaledRadius;
-            return _this;
+    class Circle extends Shape_2.Shape {
+        constructor(context, canvas, _x, _y, _width, _height, color, scaledRadius) {
+            super(context, canvas, _x, _y, _width, _height, color);
+            this.radius = scaledRadius;
         }
-        Object.defineProperty(Circle.prototype, "scaledRadius", {
-            get: function () {
-                return this.radius * this.canvas.height;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Circle.prototype.draw = function (context) {
+        get scaledRadius() {
+            return this.radius * this.canvas.height;
+        }
+        draw(context) {
             context.beginPath();
             context.fillStyle = this.color;
             context.arc(this.x * this.canvas.width, this.y * this.canvas.height, this.radius * this.canvas.width, 0, Math.PI * 2);
             context.fill();
-        };
-        return Circle;
-    }(Shape_2.Shape));
+        }
+    }
     exports.Circle = Circle;
 });
 define("Player", ["require", "exports", "Circle"], function (require, exports, Circle_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var Player = (function (_super) {
-        __extends(Player, _super);
-        function Player(context, canvas, _x, _y, _width, _height, color, _radius, acceleration) {
-            var _this = _super.call(this, context, canvas, _x, _y, _width, _height, color, _radius) || this;
-            _this.acceleration = acceleration;
-            return _this;
+    class Player extends Circle_1.Circle {
+        constructor(context, canvas, _x, _y, _width, _height, color, _radius, acceleration) {
+            super(context, canvas, _x, _y, _width, _height, color, _radius);
+            this.acceleration = acceleration;
         }
-        return Player;
-    }(Circle_1.Circle));
+    }
     exports.Player = Player;
 });
 define("Food", ["require", "exports", "Circle"], function (require, exports, Circle_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var Food = (function (_super) {
-        __extends(Food, _super);
-        function Food(context, canvas, _x, _y, _width, _height, color, _radius) {
-            return _super.call(this, context, canvas, _x, _y, _width, _height, color, _radius) || this;
+    class Food extends Circle_2.Circle {
+        constructor(context, canvas, _x, _y, _width, _height, color, _radius) {
+            super(context, canvas, _x, _y, _width, _height, color, _radius);
         }
-        return Food;
-    }(Circle_2.Circle));
+    }
     exports.Food = Food;
 });
 define("Config", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var PLAYER_SIZE = 10 / 2000;
+    const PLAYER_SIZE = 10 / 2000;
     exports.PLAYER_SIZE = PLAYER_SIZE;
-    var PLAYER_RADIUS = 5 / 700;
+    const PLAYER_RADIUS = 5 / 700;
     exports.PLAYER_RADIUS = PLAYER_RADIUS;
-    var PLAYER_COLOR = '#183c3d';
+    const PLAYER_COLOR = '#183c3d';
     exports.PLAYER_COLOR = PLAYER_COLOR;
-    var BACKGROUND_COLOR = '#eeeefe';
+    const BACKGROUND_COLOR = '#eeeefe';
     exports.BACKGROUND_COLOR = BACKGROUND_COLOR;
-    var PLAYER_ACCELERATION = 0.09;
+    const PLAYER_ACCELERATION = 0.09;
     exports.PLAYER_ACCELERATION = PLAYER_ACCELERATION;
-    var FIELD_COLOR = 'rgba(238, 238, 254, 0.8)';
+    const FIELD_COLOR = 'rgba(238, 238, 254, 0.8)';
     exports.FIELD_COLOR = FIELD_COLOR;
-    var FONT_COLOR = '#937cdd';
+    const FONT_COLOR = '#937cdd';
     exports.FONT_COLOR = FONT_COLOR;
-    var CANVAS_SCALE = 55;
+    const CANVAS_SCALE = 55;
     exports.CANVAS_SCALE = CANVAS_SCALE;
-    var RESIZE_COEF = 0.505;
+    const RESIZE_COEF = 0.505;
     exports.RESIZE_COEF = RESIZE_COEF;
 });
 define("Painter", ["require", "exports", "Player", "Food", "Config"], function (require, exports, Player_1, Food_1, Config_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var Painter = (function () {
-        function Painter() {
+    class Painter {
+        constructor() {
             this.state = {
                 players: null,
                 food: null,
@@ -179,7 +136,7 @@ define("Painter", ["require", "exports", "Player", "Food", "Config"], function (
                 radius: 0,
             };
         }
-        Painter.prototype.paint = function (context, canvas, statePlayers, movement, player, field, start, food_length, enemies_length, food, enemies) {
+        paint(context, canvas, statePlayers, movement, player, field, start, food_length, enemies_length, food, enemies) {
             this.context = context;
             this.canvas = canvas;
             this.state.players = statePlayers;
@@ -193,8 +150,8 @@ define("Painter", ["require", "exports", "Player", "Food", "Config"], function (
             this.start = start;
             this.context.setTransform(1, 0, 0, 1, 0, 0);
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            var xReview = this.canvas.width / Config_1.RESIZE_COEF;
-            var yReview = this.canvas.height / Config_1.RESIZE_COEF;
+            let xReview = this.canvas.width / Config_1.RESIZE_COEF;
+            let yReview = this.canvas.height / Config_1.RESIZE_COEF;
             this.context.setTransform(xReview / this.canvas.width, 0, 0, yReview / this.canvas.height, this._gameCameraCoordinates().x, this._gameCameraCoordinates().y);
             this.field.draw(this.context);
             if (this.start) {
@@ -205,8 +162,8 @@ define("Painter", ["require", "exports", "Player", "Food", "Config"], function (
             else {
                 this._drawWallpaper();
             }
-        };
-        Painter.prototype._drawWallpaper = function () {
+        }
+        _drawWallpaper() {
             this.context.fillStyle = Config_1.FIELD_COLOR;
             this.context.globalAlpha = 1;
             this.context.fillRect(0, 0, this.canvas.scrollWidth, this.canvas.scrollHeight);
@@ -215,9 +172,9 @@ define("Painter", ["require", "exports", "Player", "Food", "Config"], function (
             this.context.fillText('AGARIO', this.canvas.width * 3 / 10, this.canvas.height * 4 / 10);
             this.context.font = this.canvas.height * 1 / 9 + 'px lobster';
             this.context.fillText('Click to start', this.canvas.width * 3 / 10, this.canvas.height * 5 / 10);
-        };
-        Painter.prototype._drawPlayers = function () {
-            for (var id in this.state.players) {
+        }
+        _drawPlayers() {
+            for (let id in this.state.players) {
                 this.other_players = this.state.players[id];
                 this.movement.width = this.other_players.width;
                 this.movement.height = this.other_players.height;
@@ -228,20 +185,20 @@ define("Painter", ["require", "exports", "Player", "Food", "Config"], function (
                 this.context.fill();
                 this.context.fillStyle = 'black';
                 this.context.font = this.other_players.width * this.canvas.width / 1.5 + 'px lobster';
-                var width = Math.round(this.other_players.width * 10000) / 100;
+                let width = Math.round(this.other_players.width * 10000) / 100;
                 this.context.fillText(String(width), (this.other_players.x - this.other_players.width / 2) * this.canvas.width, (this.other_players.y + this.other_players.height / 2) * this.canvas.height);
             }
-        };
-        Painter.prototype._drawFood = function () {
-            for (var i = 0; i < this.state.food_length; i++) {
-                var food = this.state.food[i];
+        }
+        _drawFood() {
+            for (let i = 0; i < this.state.food_length; i++) {
+                let food = this.state.food[i];
                 food = new Food_1.Food(this.context, this.canvas, food.x, food.y, food.width, food.height, food.color, food.radius);
                 food.draw(this.context);
             }
-        };
-        Painter.prototype._drawEnemies = function () {
-            for (var i = 0; i < this.state.enemies_length; i++) {
-                var enemy = this.state.enemies[i];
+        }
+        _drawEnemies() {
+            for (let i = 0; i < this.state.enemies_length; i++) {
+                let enemy = this.state.enemies[i];
                 enemy = new Player_1.Player(this.context, this.canvas, enemy.x, enemy.y, enemy.width, enemy.height, enemy.color, enemy.radius, enemy.acceleration);
                 this.context.beginPath();
                 this.context.fillStyle = enemy.color;
@@ -249,27 +206,26 @@ define("Painter", ["require", "exports", "Player", "Food", "Config"], function (
                 this.context.fill();
                 this.context.fillStyle = 'black';
                 this.context.font = enemy.width * this.canvas.width / 1.5 + 'px lobster';
-                var width = Math.round(enemy.width * 10000) / 100;
+                let width = Math.round(enemy.width * 10000) / 100;
                 this.context.fillText(String(width), (enemy.x - enemy.width / 2) * this.canvas.width, (enemy.y + enemy.height / 2) * this.canvas.height);
             }
-        };
-        Painter.prototype._gameCameraCoordinates = function () {
-            var cameraX = Math.round((this.canvas.width / Config_1.CANVAS_SCALE - this.movement.x * this.canvas.width - this.player.width / 2));
-            var cameraY = Math.round((this.canvas.height / Config_1.CANVAS_SCALE - this.movement.y * this.canvas.height - this.player.height / 2));
+        }
+        _gameCameraCoordinates() {
+            let cameraX = Math.round((this.canvas.width / Config_1.CANVAS_SCALE - this.movement.x * this.canvas.width - this.player.width / 2));
+            let cameraY = Math.round((this.canvas.height / Config_1.CANVAS_SCALE - this.movement.y * this.canvas.height - this.player.height / 2));
             return { x: cameraX, y: cameraY };
-        };
-        return Painter;
-    }());
+        }
+    }
     exports.Painter = Painter;
 });
 define("game", ["require", "exports", "Field", "Player", "Painter", "Config"], function (require, exports, Field_1, Player_2, Painter_1, Config_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    //let io = require('socket.io');
-    var socket = io();
-    var Game = (function () {
-        function Game() {
-            var _this = this;
+    /*declare const require: any;
+    const io = require('socket.io-client');*/
+    let socket = io();
+    class Game {
+        constructor() {
             this.state = {
                 players: null,
                 food: null,
@@ -291,62 +247,62 @@ define("game", ["require", "exports", "Field", "Player", "Painter", "Config"], f
             this.field = new Field_1.Field(this.context, this.canvas, 0, 0, 1, 1, Config_2.BACKGROUND_COLOR);
             this.player = new Player_2.Player(this.context, this.canvas, this.canvas.width / 2, this.canvas.height / 2, Config_2.PLAYER_SIZE, Config_2.PLAYER_SIZE, Config_2.PLAYER_COLOR, Config_2.PLAYER_RADIUS, Config_2.PLAYER_ACCELERATION);
             this.draw = new Painter_1.Painter();
-            socket.emit('new player');
-            this.canvas.onclick = function (event) {
-                _this.start = true;
+            socket.emit('new_player');
+            this.canvas.onclick = (event) => {
+                this.start = true;
             };
-            socket.on("player_created", function () {
-                socket.on('state', function (state) {
-                    _this.state.players = state.players;
-                    _this.state.food = state.food;
-                    _this.state.food_length = state.food.length;
-                    for (var i = 0; i < _this.state.food_length; i++) {
-                        _this.state.food_width = state.food[i].width;
-                        _this.state.food_radius = state.food[i].radius;
+            socket.on("player_created", () => {
+                socket.on('update_data', (state) => {
+                    let newState = JSON.parse(state);
+                    this.state.players = newState.players;
+                    this.state.food = newState["food"];
+                    this.state.food_length = newState.food.length;
+                    for (let j = 0; j < this.state.food_length; j++) {
+                        this.state.food_width = newState["food"][j]["width"];
+                        this.state.food_radius = newState["food"][j]["radius"];
+                        console.log(this.state.food_width);
                     }
-                    _this.state.enemies = state.enemies;
-                    _this.state.enemies_length = state.enemies.length;
-                    for (var i = 0; i < _this.state.enemies_length; i++) {
-                        _this.state.enemies_width = state.enemies[i].width;
-                        _this.state.enemies_radius = state.enemies[i].radius;
+                    this.state.enemies = newState["enemies"];
+                    this.state.enemies_length = newState["enemies"]["length"];
+                    for (let i = 0; i < this.state.enemies_length; i++) {
+                        this.state.enemies_width = newState["enemies"][i]["width"];
+                        this.state.enemies_radius = newState["enemies"][i]["radius"];
                     }
                 });
             });
             socket.emit('disconnect');
-            window.addEventListener("resize", function () {
-                _this._resize();
+            window.addEventListener("resize", () => {
+                this._resize();
             });
             this._resize();
             requestAnimationFrame(this.onLoop.bind(this));
         }
-        Game.prototype._update = function () {
-            socket.emit('movement', this.movement);
+        _update() {
             this._mouseCoordinates();
-        };
-        Game.prototype._mouseCoordinates = function () {
-            var _this = this;
-            addEventListener("mousemove", function (event) {
-                _this.movement.x = (event.offsetX / _this.canvas.clientWidth);
-                _this.movement.y = (event.offsetY / _this.canvas.clientHeight);
+        }
+        _mouseCoordinates() {
+            addEventListener("mousemove", (event) => {
+                this.movement["x"] = (event.offsetX / this.canvas.clientWidth);
+                this.movement["y"] = (event.offsetY / this.canvas.clientHeight);
+                socket.emit('movement', JSON.stringify(this.movement));
             });
-        };
-        Game.prototype.onLoop = function () {
+        }
+        onLoop() {
             this._update();
             this.draw.paint(this.context, this.canvas, this.state.players, this.movement, this.player, this.field, this.start, this.state.food_length, this.state.enemies_length, this.state.food, this.state.enemies);
             requestAnimationFrame(this.onLoop.bind(this));
-        };
-        Game.prototype._resize = function () {
-            var canvas = this.canvas;
-            var width = canvas.clientWidth;
-            var height = canvas.clientHeight;
+        }
+        _resize() {
+            let canvas = this.canvas;
+            const width = canvas.clientWidth;
+            const height = canvas.clientHeight;
             if (canvas.width !== width || canvas.height !== height) {
                 canvas.width = width;
                 canvas.height = height;
                 return true;
             }
             return false;
-        };
-        return Game;
-    }());
-    var game = new Game;
+        }
+    }
+    const game = new Game;
 });

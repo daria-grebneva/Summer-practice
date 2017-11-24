@@ -2,6 +2,7 @@
 import {CollisionChecker} from './CollisionChecker';
 import {MovementController} from './MovementController';
 import {NewPlayer} from './NewPlayer';
+import {KEY_MOVEMENT, KEY_UPDATE_DATA, KEY_PLAYERS} from './Config';
 
 const express = require('express');
 const http = require('http');
@@ -9,7 +10,7 @@ const path = require('path');
 const socketIO = require('socket.io');
 const app = express();
 const server = http.Server(app);
-const io = socketIO(server);
+export const io = socketIO(server);
 const dirname = "./";
 const food = [];
 const enemies = [];
@@ -30,26 +31,29 @@ const collisionChecker = new CollisionChecker();
 const movementController = new MovementController();
 
 let state = {
-  "players": {},
-  "food": movementController.foodPositions(food),//FoodPositions.init(food),
-  "enemies": movementController.enemiesPositions(enemies),//EnemiesPositions.init(enemies),
+  "p": {},
+  "f": movementController.foodPositions(food),
+  "e": movementController.enemiesPositions(enemies)
 };
 
-io.on('connection', function (socket) {
-  NewPlayer.create(socket, state);
 
+io.on('connection',  function (socket) {
+  NewPlayer.create(socket, state);
   socket.on('disconnect', function () {
-    delete state.players[socket.id];
+    delete state[KEY_PLAYERS][socket.id];
   });
 
-  socket.on('movement', function (data) {
-   let  player = state.players[socket.id] || {};
-    movementController.movePlayer(data.x, data.y, player);
+  socket.on(KEY_MOVEMENT, function (data) {
+    let newData = JSON.parse(data);
+    let  player = state[KEY_PLAYERS][socket.id] || {};
+    movementController.movePlayer(newData["x"], newData["y"], player);
     collisionChecker.check(socket, state, food, enemies);
     movementController.moveEnemy(state);
   });
 });
 
-setInterval(function () {
-  io.sockets.emit('state', state);
+setInterval(function (socket) {
+  collisionChecker.check(socket, state, food, enemies);
+  movementController.moveEnemy(state);
+  io.sockets.emit(KEY_UPDATE_DATA, JSON.stringify(state));
 }, 1000 / 60);
