@@ -3,25 +3,15 @@ import {
   MAX_ENEMY_NUMBER,
   MAX_FOOD_NUMBER,
   CONVERGENCE_RADIUS,
-  SMALL_BALL_SIZE,
-  SMALL_BALL_RADIUS,
-  ENEMY_SIZE,
-  ENEMY_RADIUS,
-  ENEMY_ACCELERATION,
-  PLAYER_RADIUS,
-  PLAYER_SIZE,
-  PLAYER_ACCELERATION,
   KEY_FOOD,
   KEY_PLAYERS,
   KEY_ENEMIES
 } from './Config';
-import {Utils} from './Utils';
 
 export class MovementController {
   moveEnemy(state) {
     for (let j = 0; j < MAX_ENEMY_NUMBER; j++) {
       for (let g of Object.keys(state[KEY_PLAYERS])) {
-
         if (this._radiusVisibility(state[KEY_PLAYERS][g], state[KEY_ENEMIES][j], CONVERGENCE_RADIUS)) {
           this.movePlayer(state[KEY_PLAYERS][g].x, state[KEY_PLAYERS][g].y, state[KEY_ENEMIES][j])
         } else {
@@ -56,48 +46,6 @@ export class MovementController {
       obj.y += yDistance * obj.acceleration;
     }
   }
-
-  foodPositions(food) {
-    for (let i = 0; MAX_FOOD_NUMBER - food.length > 0; i++) {
-      food.push({
-        x: Utils.randomCoordinates(0, 1),
-        y: Utils.randomCoordinates(0, 1),
-        color: Utils.randomColor(),
-        width: SMALL_BALL_SIZE,
-        height: SMALL_BALL_SIZE,
-        radius: SMALL_BALL_RADIUS,
-      })
-    }
-    return food;
-  }
-
-  enemiesPositions(enemies) {
-    for (let i = 0; MAX_ENEMY_NUMBER - enemies.length >= 1; i++) {
-      enemies.push({
-        x: Utils.randomCoordinates(0, 1),
-        y: Utils.randomCoordinates(0, 1),
-        color: Utils.randomColor(),
-        width: ENEMY_SIZE,
-        height: ENEMY_SIZE,
-        radius: ENEMY_RADIUS,
-        acceleration: ENEMY_ACCELERATION,
-      })
-    }
-    return enemies;
-  }
-
-  playersPositions(id, state) {
-    state[KEY_PLAYERS][id] = {
-      x: Utils.randomCoordinates(0, 1),
-      y: Utils.randomCoordinates(0, 1),
-      radius: PLAYER_RADIUS,
-      color: Utils.randomColor(),
-      width: PLAYER_SIZE,
-      height: PLAYER_SIZE,
-      acceleration: PLAYER_ACCELERATION,
-    };
-  }
-
 
   _findNearestFoodCoordinate(enemy, state) {
     let coordinate_x = 1;

@@ -8,9 +8,9 @@ const PLAYER_SIZE = 10 / 2000;
 const PLAYER_RADIUS = 5 / 700;
 const PLAYER_ACCELERATION = 0.09;
 
-const CONVERGENCE_RADIUS = 1 / 25;
+const CONVERGENCE_RADIUS = 2 / 25;
 
-const MAX_ENEMY_NUMBER = 6;
+const MAX_ENEMY_NUMBER = 0;
 const ENEMY_SIZE = 11 / 2000;
 const ENEMY_RADIUS = 5 / 700;
 const ENEMY_ACCELERATION = 0.01;
@@ -26,6 +26,7 @@ const KEY_UPDATE_DATA = "u";
 const KEY_FOOD = "f";
 const KEY_PLAYERS = "p";
 const KEY_ENEMIES = "e";
+const KEY_PLAYER_CREATED = "c";
 export {
   MAX_FOOD_NUMBER,
   SMALL_BALL_SIZE,
@@ -49,5 +50,6 @@ export {
   KEY_UPDATE_DATA,
   KEY_FOOD,
   KEY_PLAYERS,
-  KEY_ENEMIES
+  KEY_ENEMIES,
+  KEY_PLAYER_CREATED
 }

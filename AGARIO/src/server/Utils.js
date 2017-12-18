@@ -11,12 +11,4 @@ export class Utils{
     }
     return colorNum;
   }
-  /*static randomColor() {
-    let R = Math.floor(Math.random() * (256 - 1 + 1)) + 1;
-    let G = Math.floor(Math.random() * (256 - 1 + 1)) + 1;
-    let B = Math.floor(Math.random() * (256 - 1 + 1)) + 1;
-    let list = '';
-    list = '{' + R + ', ' + G + ', ' + B + '}';
-    return list;
-  }*/
 }
