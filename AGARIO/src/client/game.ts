@@ -41,29 +41,34 @@ class Game {
         this.player = new Player(this.context, this.canvas, this.canvas.width / 2, this.canvas.height / 2, PLAYER_SIZE, PLAYER_SIZE, PLAYER_COLOR, PLAYER_RADIUS, PLAYER_ACCELERATION);
 
         this.draw = new Painter();
-        socket.emit('new_player');
+        socket.emit("n");
 
         this.canvas.onclick = (event) => {
             this.start = true;
 
         };
 
-        socket.on("player_created", () => {
-            socket.on('update_data', (state) => {
+        socket.on("c", () => {
+            socket.on("u", (state) => {
                 let newState = JSON.parse(state);
-                this.state.players = newState.players;
-                this.state.food = newState["food"];
-                this.state.food_length = newState.food.length;
-                for (let j = 0; j < this.state.food_length; j++) {
-                    this.state.food_width = newState["food"][j]["width"];
-                    this.state.food_radius = newState["food"][j]["radius"];
-                    console.log(this.state.food_width);
+                this.state.players = newState["p"];
+                this.state.food = newState["f"];
+                this.state.food_length = 0;
+                for (let property in this.state.food) {
+                    if (Object.prototype.hasOwnProperty.call(this.state.food, property)) {
+                        this.state.food_width = newState["f"]["radius"];
+                        this.state.food_radius = newState["f"]["radius"];
+                        this.state.food_length++;
+                    }
                 }
-                this.state.enemies = newState["enemies"];
-                this.state.enemies_length = newState["enemies"]["length"];
-                for (let i = 0; i < this.state.enemies_length; i++) {
-                    this.state.enemies_width = newState["enemies"][i]["width"];
-                    this.state.enemies_radius = newState["enemies"][i]["radius"];
+                this.state.enemies = newState["e"];
+                this.state.enemies_length = 0;
+                for (let property in this.state.enemies) {
+                    if (Object.prototype.hasOwnProperty.call(this.state.enemies, property)) {
+                        this.state.enemies_width = newState["e"]["radius"];
+                        this.state.enemies_radius = newState["e"]["radius"];
+                        this.state.enemies_length++;
+                    }
                 }
             });
         });
@@ -85,8 +90,9 @@ class Game {
         addEventListener("mousemove", (event) => {
             this.movement["x"] = (event.offsetX / this.canvas.clientWidth);
             this.movement["y"] = (event.offsetY / this.canvas.clientHeight);
-            socket.emit('movement', JSON.stringify(this.movement));
+            socket.emit("m", JSON.stringify(this.movement));
         });
+
     }
 
 

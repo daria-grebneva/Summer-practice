@@ -6,8 +6,8 @@ const BACKGROUND_COLOR = '#eeeefe';
 const PLAYER_ACCELERATION = 0.09;
 const FIELD_COLOR = 'rgba(238, 238, 254, 0.8)';
 const FONT_COLOR = '#937cdd';
-const CANVAS_SCALE = 55;
-const RESIZE_COEF = 0.505;
+const CANVAS_SCALE = 55;//4;
+const RESIZE_COEF = 0.505;//0.605;
 export {
     PLAYER_SIZE,
     PLAYER_RADIUS,
