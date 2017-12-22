@@ -102,6 +102,11 @@ var KEY_FOOD = "f";
 var KEY_PLAYERS = "p";
 var KEY_ENEMIES = "e";
 var KEY_PLAYER_CREATED = "c";
+var KEY_ID = "i";
+var KEY_RADIUS = "r";
+var KEY_COLOR = "l";
+var KEY_ACCELERATION = "a";
+var KEY_NICKNAME = "n";
 exports.MAX_FOOD_NUMBER = MAX_FOOD_NUMBER;
 exports.SMALL_BALL_SIZE = SMALL_BALL_SIZE;
 exports.SMALL_BALL_RADIUS = SMALL_BALL_RADIUS;
@@ -126,6 +131,11 @@ exports.KEY_FOOD = KEY_FOOD;
 exports.KEY_PLAYERS = KEY_PLAYERS;
 exports.KEY_ENEMIES = KEY_ENEMIES;
 exports.KEY_PLAYER_CREATED = KEY_PLAYER_CREATED;
+exports.KEY_ID = KEY_ID;
+exports.KEY_RADIUS = KEY_RADIUS;
+exports.KEY_COLOR = KEY_COLOR;
+exports.KEY_ACCELERATION = KEY_ACCELERATION;
+exports.KEY_NICKNAME = KEY_NICKNAME;
 
 /***/ }),
 /* 1 */
@@ -157,10 +167,10 @@ var Initializer = exports.Initializer = function () {
     value: function foodPosition(food) {
       for (var i = 0; _Config.MAX_FOOD_NUMBER - food.length > 0; i++) {
         food.push({
-          x: _Utils.Utils.randomCoordinates(0, 1),
-          y: _Utils.Utils.randomCoordinates(0, 1),
-          color: _Utils.Utils.randomColor(),
-          radius: _Config.SMALL_BALL_RADIUS
+          "x": _Utils.Utils.randomCoordinates(0, 1),
+          "y": _Utils.Utils.randomCoordinates(0, 1),
+          "l": _Utils.Utils.randomColor(),
+          "r": _Config.SMALL_BALL_RADIUS
         });
       }
       return food;
@@ -170,11 +180,11 @@ var Initializer = exports.Initializer = function () {
     value: function enemiesPosition(enemies) {
       for (var i = 0; _Config.MAX_ENEMY_NUMBER - enemies.length >= 1; i++) {
         enemies.push({
-          x: _Utils.Utils.randomCoordinates(0, 1),
-          y: _Utils.Utils.randomCoordinates(0, 1),
-          color: _Utils.Utils.randomColor(),
-          radius: _Config.ENEMY_RADIUS,
-          acceleration: _Config.ENEMY_ACCELERATION
+          "x": _Utils.Utils.randomCoordinates(0, 1),
+          "y": _Utils.Utils.randomCoordinates(0, 1),
+          "l": _Utils.Utils.randomColor(),
+          "r": _Config.ENEMY_RADIUS,
+          "a": _Config.ENEMY_ACCELERATION
         });
       }
       return enemies;
@@ -183,13 +193,13 @@ var Initializer = exports.Initializer = function () {
     key: 'playersPosition',
     value: function playersPosition(id, state, nickname) {
       state[_Config.KEY_PLAYERS][id] = {
-        id_player: id,
-        x: _Utils.Utils.randomCoordinates(0, 1),
-        y: _Utils.Utils.randomCoordinates(0, 1),
-        radius: _Config.PLAYER_RADIUS,
-        color: _Utils.Utils.randomColor(),
-        acceleration: _Config.PLAYER_ACCELERATION,
-        nickname: nickname
+        "i": id,
+        "x": _Utils.Utils.randomCoordinates(0, 1),
+        "y": _Utils.Utils.randomCoordinates(0, 1),
+        "r": _Config.PLAYER_RADIUS,
+        "l": _Utils.Utils.randomColor(),
+        "a": _Config.PLAYER_ACCELERATION,
+        "n": nickname
       };
     }
   }]);
@@ -337,7 +347,7 @@ var CollisionChecker = exports.CollisionChecker = function () {
         //collision player <-> enemy
         for (var _k = 0; _k != _Config.MAX_ENEMY_NUMBER; _k++) {
           if (this._canEat(state[_Config.KEY_ENEMIES][_k], state[_Config.KEY_PLAYERS][g])) {
-            initializer.playersPosition(g, state, state[_Config.KEY_PLAYERS][g]["nickname"]);
+            initializer.playersPosition(g, state, state[_Config.KEY_PLAYERS][g][_Config.KEY_NICKNAME]);
           } else if (this._canEat(state[_Config.KEY_PLAYERS][g], state[_Config.KEY_ENEMIES][_k])) {
             state[_Config.KEY_ENEMIES].splice(_k, 1);
             initializer.enemiesPosition(enemies);
@@ -346,7 +356,7 @@ var CollisionChecker = exports.CollisionChecker = function () {
         //collision player <-> player
         for (var _k2 in state[_Config.KEY_PLAYERS]) {
           if (this._canEat(state[_Config.KEY_PLAYERS][_k2], state[_Config.KEY_PLAYERS][g])) {
-            initializer.playersPosition(g, state, state[_Config.KEY_PLAYERS][g]["nickname"]);
+            initializer.playersPosition(g, state, state[_Config.KEY_PLAYERS][g][_Config.KEY_NICKNAME]);
           }
         }
         //collision player <-> food
@@ -361,19 +371,19 @@ var CollisionChecker = exports.CollisionChecker = function () {
   }, {
     key: '_canEat',
     value: function _canEat(predator, victim) {
-      if (predator.radius > victim.radius && this._checkCollision(predator, victim)) {
+      if (predator[_Config.KEY_RADIUS] > victim[_Config.KEY_RADIUS] && this._checkCollision(predator, victim)) {
         return true;
       }
     }
   }, {
     key: '_checkCollision',
     value: function _checkCollision(predator, victim) {
-      if (Math.abs(predator.x + predator.radius - victim.x - victim.radius) < victim.radius + predator.radius && Math.abs(predator.y + predator.radius - victim.y - victim.radius) < victim.radius + predator.radius) {
-        if (predator.radius < _Config.MAX_RADIUS) {
-          predator.radius = Math.hypot(predator.radius, victim.radius);
+      if (Math.abs(predator.x + predator[_Config.KEY_RADIUS] - victim.x - victim[_Config.KEY_RADIUS]) < victim[_Config.KEY_RADIUS] + predator[_Config.KEY_RADIUS] && Math.abs(predator.y + predator[_Config.KEY_RADIUS] - victim.y - victim[_Config.KEY_RADIUS]) < victim[_Config.KEY_RADIUS] + predator[_Config.KEY_RADIUS]) {
+        if (predator[_Config.KEY_RADIUS] < _Config.MAX_RADIUS) {
+          predator[_Config.KEY_RADIUS] = Math.hypot(predator[_Config.KEY_RADIUS], victim[_Config.KEY_RADIUS]);
         }
-        if (predator.acceleration > _Config.LOW_ACCELERATION) {
-          predator.acceleration = predator.acceleration - predator.acceleration * victim.radius;
+        if (predator[_Config.KEY_ACCELERATION] > _Config.LOW_ACCELERATION) {
+          predator[_Config.KEY_ACCELERATION] = predator[_Config.KEY_ACCELERATION] - predator[_Config.KEY_ACCELERATION] * victim[_Config.KEY_RADIUS];
         }
         return true;
       }
@@ -502,8 +512,8 @@ var MovementController = exports.MovementController = function () {
       var yDistance = coordY - obj.y;
       var distance = Math.sqrt(xDistance * xDistance + yDistance * yDistance);
       if (distance > 0) {
-        obj.x += xDistance * obj.acceleration;
-        obj.y += yDistance * obj.acceleration;
+        obj.x += xDistance * obj[_Config.KEY_ACCELERATION];
+        obj.y += yDistance * obj[_Config.KEY_ACCELERATION];
       }
     }
   }, {
@@ -535,22 +545,22 @@ var MovementController = exports.MovementController = function () {
   }, {
     key: '_positionRight',
     value: function _positionRight(first_obj, second_obj, radius) {
-      if (first_obj.x - second_obj.x <= radius && first_obj.x + second_obj.radius / 2 - second_obj.x > 0) return true;
+      if (first_obj.x - second_obj.x <= radius && first_obj.x + second_obj[_Config.KEY_RADIUS] / 2 - second_obj.x > 0) return true;
     }
   }, {
     key: '_positionLeft',
     value: function _positionLeft(first_obj, second_obj, radius) {
-      if (second_obj.x - first_obj.x <= radius && second_obj.x + second_obj.radius / 2 - first_obj.x > 0) return true;
+      if (second_obj.x - first_obj.x <= radius && second_obj.x + second_obj[_Config.KEY_RADIUS] / 2 - first_obj.x > 0) return true;
     }
   }, {
     key: '_positionUp',
     value: function _positionUp(first_obj, second_obj, radius) {
-      if (second_obj.y - first_obj.y < radius && second_obj.y + second_obj.radius / 2 - first_obj.y > 0) return true;
+      if (second_obj.y - first_obj.y < radius && second_obj.y + second_obj[_Config.KEY_RADIUS] / 2 - first_obj.y > 0) return true;
     }
   }, {
     key: '_positionDown',
     value: function _positionDown(first_obj, second_obj, radius) {
-      if (first_obj.y - second_obj.y < radius && first_obj.y + second_obj.radius / 2 - second_obj.y > 0) return true;
+      if (first_obj.y - second_obj.y < radius && first_obj.y + second_obj[_Config.KEY_RADIUS] / 2 - second_obj.y > 0) return true;
     }
   }]);
 
@@ -588,7 +598,7 @@ var NewPlayer = exports.NewPlayer = function () {
     key: 'create',
     value: function create(socket, state) {
       socket.on(_Config.KEY_NEW_PLAYER, function (data) {
-        var nickname = JSON.stringify(data);
+        var nickname = data; //JSON.parse(data);
         initializer.playersPosition(socket.id, state, nickname);
         socket.emit(_Config.KEY_PLAYER_CREATED, JSON.stringify(state[_Config.KEY_PLAYERS][socket.id]));
       });

@@ -27,6 +27,11 @@ const KEY_FOOD = "f";
 const KEY_PLAYERS = "p";
 const KEY_ENEMIES = "e";
 const KEY_PLAYER_CREATED = "c";
+const KEY_ID = "i";
+const KEY_RADIUS = "r";
+const KEY_COLOR = "l";
+const KEY_ACCELERATION = "a";
+const KEY_NICKNAME = "n";
 export {
   MAX_FOOD_NUMBER,
   SMALL_BALL_SIZE,
@@ -51,5 +56,10 @@ export {
   KEY_FOOD,
   KEY_PLAYERS,
   KEY_ENEMIES,
-  KEY_PLAYER_CREATED
+  KEY_PLAYER_CREATED,
+  KEY_ID,
+  KEY_RADIUS,
+  KEY_COLOR,
+  KEY_ACCELERATION,
+  KEY_NICKNAME
 }

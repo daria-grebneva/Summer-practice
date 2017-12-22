@@ -107,9 +107,9 @@ define("Config", ["require", "exports"], function (require, exports) {
     exports.FIELD_COLOR = FIELD_COLOR;
     const FONT_COLOR = '#937cdd';
     exports.FONT_COLOR = FONT_COLOR;
-    const CANVAS_SCALE = 55; //4;//55;
+    const CANVAS_SCALE = 55; //4;
     exports.CANVAS_SCALE = CANVAS_SCALE;
-    const RESIZE_COEF = 0.505; //0.605;//0.505;
+    const RESIZE_COEF = 0.505; //0.605;
     exports.RESIZE_COEF = RESIZE_COEF;
 });
 define("Painter", ["require", "exports", "Player", "Food", "Config"], function (require, exports, Player_1, Food_1, Config_1) {
@@ -256,12 +256,6 @@ define("game", ["require", "exports", "Field", "Player", "Painter", "Config"], f
                     let newState = JSON.parse(state);
                     this.state.players = newState["p"];
                     this.state.food = newState["f"];
-                    /* this.state.food_length = newState["f"].size();
-                    for (let j = 0; j < this.state.food_length; j++) {
-                        this.state.food_width = newState["f"][j]["radius"];
-                        this.state.food_radius = newState["f"][j]["radius"];
-                        console.log(this.state.food_width);
-                    }*/
                     this.state.food_length = 0;
                     for (let property in this.state.food) {
                         if (Object.prototype.hasOwnProperty.call(this.state.food, property)) {
@@ -271,11 +265,6 @@ define("game", ["require", "exports", "Field", "Player", "Painter", "Config"], f
                         }
                     }
                     this.state.enemies = newState["e"];
-                    /*this.state.enemies_length = newState["e"].size();//["length"]; //!!!
-                    for (let i = 0; i < this.state.enemies_length; i++) {
-                        this.state.enemies_width = newState["e"][i]["radius"];
-                        this.state.enemies_radius = newState["e"][i]["radius"];
-                    }*/
                     this.state.enemies_length = 0;
                     for (let property in this.state.enemies) {
                         if (Object.prototype.hasOwnProperty.call(this.state.enemies, property)) {
@@ -291,14 +280,15 @@ define("game", ["require", "exports", "Field", "Player", "Painter", "Config"], f
                 this._resize();
             });
             this._resize();
-            requestAnimationFrame(this.onLoop.bind(this));
+            // requestAnimationFrame(this.onLoop.bind(this));
+            setInterval(() => {
+                this.onLoop();
+            }, 1000 / 15);
         }
         _update() {
             this._mouseCoordinates();
         }
         _mouseCoordinates() {
-            //this.movement["x"] = 0;
-            //  this.movement["y"] = 0;
             addEventListener("mousemove", (event) => {
                 this.movement["x"] = (event.offsetX / this.canvas.clientWidth);
                 this.movement["y"] = (event.offsetY / this.canvas.clientHeight);
@@ -306,9 +296,10 @@ define("game", ["require", "exports", "Field", "Player", "Painter", "Config"], f
             });
         }
         onLoop() {
+            console.log(1);
             this._update();
             this.draw.paint(this.context, this.canvas, this.state.players, this.movement, this.player, this.field, this.start, this.state.food_length, this.state.enemies_length, this.state.food, this.state.enemies);
-            requestAnimationFrame(this.onLoop.bind(this));
+            //requestAnimationFrame(this.onLoop.bind(this));
         }
         _resize() {
             let canvas = this.canvas;

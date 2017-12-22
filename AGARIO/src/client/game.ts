@@ -79,7 +79,10 @@ class Game {
         });
         this._resize();
 
-        requestAnimationFrame(this.onLoop.bind(this));
+       // requestAnimationFrame(this.onLoop.bind(this));
+        setInterval(() => {
+            this.onLoop();
+        }, 1000 / 30);
     }
 
     _update() {
@@ -97,9 +100,10 @@ class Game {
 
 
     onLoop() {
+        console.log(1);
         this._update();
         this.draw.paint(this.context, this.canvas, this.state.players, this.movement, this.player, this.field, this.start, this.state.food_length, this.state.enemies_length, this.state.food, this.state.enemies);
-        requestAnimationFrame(this.onLoop.bind(this));
+        //requestAnimationFrame(this.onLoop.bind(this));
     }
 
     _resize() {

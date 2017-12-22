@@ -5,7 +5,9 @@ import {
   CONVERGENCE_RADIUS,
   KEY_FOOD,
   KEY_PLAYERS,
-  KEY_ENEMIES
+  KEY_ENEMIES,
+  KEY_ACCELERATION,
+  KEY_RADIUS
 } from './Config';
 
 export class MovementController {
@@ -42,8 +44,8 @@ export class MovementController {
     let yDistance = coordY - obj.y;
     let distance = Math.sqrt(xDistance * xDistance + yDistance * yDistance);
     if (distance > 0) {
-      obj.x += xDistance * obj.acceleration;
-      obj.y += yDistance * obj.acceleration;
+      obj.x += xDistance * obj[KEY_ACCELERATION];
+      obj.y += yDistance * obj[KEY_ACCELERATION];
     }
   }
 
@@ -73,22 +75,22 @@ export class MovementController {
   }
 
   _positionRight(first_obj, second_obj, radius) {
-    if ((first_obj.x - second_obj.x) <= radius && (first_obj.x + second_obj.radius / 2 - second_obj.x) > 0)
+    if ((first_obj.x - second_obj.x) <= radius && (first_obj.x + second_obj[KEY_RADIUS] / 2 - second_obj.x) > 0)
       return true;
   }
 
   _positionLeft(first_obj, second_obj, radius) {
-    if ((second_obj.x - first_obj.x) <= radius && (second_obj.x + second_obj.radius / 2 - first_obj.x) > 0)
+    if ((second_obj.x - first_obj.x) <= radius && (second_obj.x + second_obj[KEY_RADIUS] / 2 - first_obj.x) > 0)
       return true;
   }
 
   _positionUp(first_obj, second_obj, radius) {
-    if ((second_obj.y - first_obj.y) < radius && (second_obj.y + second_obj.radius / 2 - first_obj.y) > 0)
+    if ((second_obj.y - first_obj.y) < radius && (second_obj.y + second_obj[KEY_RADIUS] / 2 - first_obj.y) > 0)
       return true;
   }
 
   _positionDown(first_obj, second_obj, radius) {
-    if ((first_obj.y - second_obj.y) < radius && (first_obj.y + second_obj.radius / 2 - second_obj.y) > 0)
+    if ((first_obj.y - second_obj.y) < radius && (first_obj.y + second_obj[KEY_RADIUS] / 2 - second_obj.y) > 0)
       return true;
   }
 }

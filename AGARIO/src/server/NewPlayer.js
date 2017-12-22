@@ -10,7 +10,7 @@ import {
 export class NewPlayer {
   static create(socket, state) {
     socket.on(KEY_NEW_PLAYER, function (data) {
-      const nickname = JSON.stringify(data);
+      const nickname = data;//JSON.parse(data);
       initializer.playersPosition(socket.id, state, nickname);
       socket.emit(KEY_PLAYER_CREATED, JSON.stringify(state[KEY_PLAYERS][socket.id]));
     });

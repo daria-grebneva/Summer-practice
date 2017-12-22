@@ -7,7 +7,10 @@ import {
   MAX_RADIUS, 
   KEY_FOOD, 
   KEY_PLAYERS, 
-  KEY_ENEMIES
+  KEY_ENEMIES,
+  KEY_RADIUS,
+  KEY_ACCELERATION,
+  KEY_NICKNAME
 } from './Config';
 
 const initializer = new Initializer();
@@ -40,7 +43,7 @@ export class CollisionChecker {
       //collision player <-> enemy
       for (let k = 0; k != MAX_ENEMY_NUMBER; k++) {
         if (this._canEat(state[KEY_ENEMIES][k], state[KEY_PLAYERS][g])) {
-          initializer.playersPosition(g, state, state[KEY_PLAYERS][g]["nickname"]);
+          initializer.playersPosition(g, state, state[KEY_PLAYERS][g][KEY_NICKNAME]);
         }
         else if (this._canEat(state[KEY_PLAYERS][g], state[KEY_ENEMIES][k])) {
           state[KEY_ENEMIES].splice(k, 1);
@@ -50,7 +53,7 @@ export class CollisionChecker {
       //collision player <-> player
       for (let k in state[KEY_PLAYERS]) {
         if (this._canEat(state[KEY_PLAYERS][k], state[KEY_PLAYERS][g])) {
-          initializer.playersPosition(g, state, state[KEY_PLAYERS][g]["nickname"]);
+          initializer.playersPosition(g, state, state[KEY_PLAYERS][g][KEY_NICKNAME]);
         }
       }
       //collision player <-> food
@@ -64,19 +67,19 @@ export class CollisionChecker {
   }
 
   _canEat(predator, victim) {
-    if ((predator.radius > victim.radius) && (this._checkCollision(predator, victim))) {
+    if ((predator[KEY_RADIUS] > victim[KEY_RADIUS]) && (this._checkCollision(predator, victim))) {
       return true
     }
   }
 
   _checkCollision(predator, victim) {
-    if ((Math.abs(predator.x + predator.radius - victim.x - victim.radius) < (victim.radius + predator.radius)) &&
-      (Math.abs(predator.y + predator.radius - victim.y - victim.radius) < (victim.radius + predator.radius))) {
-      if (predator.radius < MAX_RADIUS) {
-        predator.radius = Math.hypot(predator.radius, victim.radius);
+    if ((Math.abs(predator.x + predator[KEY_RADIUS] - victim.x - victim[KEY_RADIUS]) < (victim[KEY_RADIUS] + predator[KEY_RADIUS])) &&
+      (Math.abs(predator.y + predator[KEY_RADIUS] - victim.y - victim[KEY_RADIUS]) < (victim[KEY_RADIUS] + predator[KEY_RADIUS]))) {
+      if (predator[KEY_RADIUS] < MAX_RADIUS) {
+        predator[KEY_RADIUS] = Math.hypot(predator[KEY_RADIUS], victim[KEY_RADIUS]);
       }
-      if (predator.acceleration > LOW_ACCELERATION) {
-        predator.acceleration = predator.acceleration - predator.acceleration * victim.radius;
+      if (predator[KEY_ACCELERATION] > LOW_ACCELERATION) {
+        predator[KEY_ACCELERATION] = predator[KEY_ACCELERATION] - predator[KEY_ACCELERATION] * victim[KEY_RADIUS];
       }
       return true;
     }
