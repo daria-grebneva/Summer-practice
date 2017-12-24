@@ -1,7 +1,21 @@
 import {Field} from "./Field";
 import {Player} from "./Player";
 import {Painter} from "./Painter"
-import {PLAYER_SIZE, PLAYER_RADIUS, PLAYER_COLOR, BACKGROUND_COLOR, PLAYER_ACCELERATION} from "./Config";
+import {
+    PLAYER_SIZE,
+    PLAYER_RADIUS,
+    PLAYER_COLOR,
+    BACKGROUND_COLOR,
+    PLAYER_ACCELERATION,
+    KEY_FOOD,
+    KEY_PLAYERS,
+    KEY_ENEMIES,
+    KEY_RADIUS,
+    KEY_MOVEMENT,
+    KEY_NEW_PLAYER,
+    KEY_UPDATE_DATA,
+    KEY_PLAYER_CREATED
+} from "./Config";
 
 /*declare const require: any;
 const io = require('socket.io-client');*/
@@ -41,32 +55,32 @@ class Game {
         this.player = new Player(this.context, this.canvas, this.canvas.width / 2, this.canvas.height / 2, PLAYER_SIZE, PLAYER_SIZE, PLAYER_COLOR, PLAYER_RADIUS, PLAYER_ACCELERATION);
 
         this.draw = new Painter();
-        socket.emit("n");
+        socket.emit(KEY_NEW_PLAYER);
 
         this.canvas.onclick = (event) => {
             this.start = true;
 
         };
 
-        socket.on("c", () => {
-            socket.on("u", (state) => {
+        socket.on(KEY_PLAYER_CREATED, () => {
+            socket.on(KEY_UPDATE_DATA, (state) => {
                 let newState = JSON.parse(state);
-                this.state.players = newState["p"];
-                this.state.food = newState["f"];
+                this.state.players = newState[KEY_PLAYERS];
+                this.state.food = newState[KEY_FOOD];
                 this.state.food_length = 0;
                 for (let property in this.state.food) {
                     if (Object.prototype.hasOwnProperty.call(this.state.food, property)) {
-                        this.state.food_width = newState["f"]["radius"];
-                        this.state.food_radius = newState["f"]["radius"];
+                        this.state.food_width = newState[KEY_FOOD][KEY_RADIUS];
+                        this.state.food_radius = newState[KEY_FOOD][KEY_RADIUS];
                         this.state.food_length++;
                     }
                 }
-                this.state.enemies = newState["e"];
+                this.state.enemies = newState[KEY_ENEMIES];
                 this.state.enemies_length = 0;
                 for (let property in this.state.enemies) {
                     if (Object.prototype.hasOwnProperty.call(this.state.enemies, property)) {
-                        this.state.enemies_width = newState["e"]["radius"];
-                        this.state.enemies_radius = newState["e"]["radius"];
+                        this.state.enemies_width = newState[KEY_ENEMIES][KEY_RADIUS];
+                        this.state.enemies_radius = newState[KEY_ENEMIES][KEY_RADIUS];
                         this.state.enemies_length++;
                     }
                 }
@@ -79,10 +93,10 @@ class Game {
         });
         this._resize();
 
-       // requestAnimationFrame(this.onLoop.bind(this));
-        setInterval(() => {
-            this.onLoop();
-        }, 1000 / 30);
+       requestAnimationFrame(this.onLoop.bind(this));
+       //  setInterval(() => {
+       //      this.onLoop();
+       //  }, 1000 / 30);
     }
 
     _update() {
@@ -93,17 +107,16 @@ class Game {
         addEventListener("mousemove", (event) => {
             this.movement["x"] = (event.offsetX / this.canvas.clientWidth);
             this.movement["y"] = (event.offsetY / this.canvas.clientHeight);
-            socket.emit("m", JSON.stringify(this.movement));
+            socket.emit(KEY_MOVEMENT, JSON.stringify(this.movement));
         });
 
     }
 
 
     onLoop() {
-        console.log(1);
         this._update();
         this.draw.paint(this.context, this.canvas, this.state.players, this.movement, this.player, this.field, this.start, this.state.food_length, this.state.enemies_length, this.state.food, this.state.enemies);
-        //requestAnimationFrame(this.onLoop.bind(this));
+        requestAnimationFrame(this.onLoop.bind(this));
     }
 
     _resize() {

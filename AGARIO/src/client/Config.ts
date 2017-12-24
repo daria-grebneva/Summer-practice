@@ -8,6 +8,15 @@ const FIELD_COLOR = 'rgba(238, 238, 254, 0.8)';
 const FONT_COLOR = '#937cdd';
 const CANVAS_SCALE = 55;//4;
 const RESIZE_COEF = 0.505;//0.605;
+const KEY_RADIUS = "r";
+const KEY_COLOR = "l";
+const KEY_FOOD = "f";
+const KEY_PLAYERS = "p";
+const KEY_ENEMIES = "e";
+const KEY_MOVEMENT = "m";
+const KEY_NEW_PLAYER = "n";
+const KEY_UPDATE_DATA = "u";
+const KEY_PLAYER_CREATED = "c";
 export {
     PLAYER_SIZE,
     PLAYER_RADIUS,
@@ -17,5 +26,14 @@ export {
     FIELD_COLOR,
     FONT_COLOR,
     CANVAS_SCALE,
-    RESIZE_COEF
+    RESIZE_COEF,
+    KEY_RADIUS,
+    KEY_COLOR,
+    KEY_FOOD,
+    KEY_PLAYERS,
+    KEY_ENEMIES,
+    KEY_MOVEMENT,
+    KEY_NEW_PLAYER,
+    KEY_UPDATE_DATA,
+    KEY_PLAYER_CREATED
 }

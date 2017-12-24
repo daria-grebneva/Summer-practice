@@ -111,6 +111,24 @@ define("Config", ["require", "exports"], function (require, exports) {
     exports.CANVAS_SCALE = CANVAS_SCALE;
     const RESIZE_COEF = 0.505; //0.605;
     exports.RESIZE_COEF = RESIZE_COEF;
+    const KEY_RADIUS = "r";
+    exports.KEY_RADIUS = KEY_RADIUS;
+    const KEY_COLOR = "l";
+    exports.KEY_COLOR = KEY_COLOR;
+    const KEY_FOOD = "f";
+    exports.KEY_FOOD = KEY_FOOD;
+    const KEY_PLAYERS = "p";
+    exports.KEY_PLAYERS = KEY_PLAYERS;
+    const KEY_ENEMIES = "e";
+    exports.KEY_ENEMIES = KEY_ENEMIES;
+    const KEY_MOVEMENT = "m";
+    exports.KEY_MOVEMENT = KEY_MOVEMENT;
+    const KEY_NEW_PLAYER = "n";
+    exports.KEY_NEW_PLAYER = KEY_NEW_PLAYER;
+    const KEY_UPDATE_DATA = "u";
+    exports.KEY_UPDATE_DATA = KEY_UPDATE_DATA;
+    const KEY_PLAYER_CREATED = "c";
+    exports.KEY_PLAYER_CREATED = KEY_PLAYER_CREATED;
 });
 define("Painter", ["require", "exports", "Player", "Food", "Config"], function (require, exports, Player_1, Food_1, Config_1) {
     "use strict";
@@ -176,38 +194,38 @@ define("Painter", ["require", "exports", "Player", "Food", "Config"], function (
         _drawPlayers() {
             for (let id in this.state.players) {
                 this.other_players = this.state.players[id];
-                this.movement.width = this.other_players.width;
-                this.movement.height = this.other_players.height;
-                this.movement.radius = this.other_players.radius;
+                this.movement.width = this.other_players[Config_1.KEY_RADIUS];
+                this.movement.height = this.other_players[Config_1.KEY_RADIUS];
+                this.movement.radius = this.other_players[Config_1.KEY_RADIUS];
                 this.context.beginPath();
-                this.context.fillStyle = this.other_players.color;
-                this.context.arc(this.other_players.x * this.canvas.width, this.other_players.y * this.canvas.height, this.movement.radius * this.canvas.width, 0, Math.PI * 2);
+                this.context.fillStyle = this.other_players[Config_1.KEY_COLOR];
+                this.context.arc(this.other_players['x'] * this.canvas.width, this.other_players['y'] * this.canvas.height, this.movement.radius * this.canvas.width, 0, Math.PI * 2);
                 this.context.fill();
                 this.context.fillStyle = 'black';
-                this.context.font = this.other_players.width * this.canvas.width / 1.5 + 'px lobster';
-                let width = Math.round(this.other_players.width * 10000) / 100;
-                this.context.fillText(String(width), (this.other_players.x - this.other_players.width / 2) * this.canvas.width, (this.other_players.y + this.other_players.height / 2) * this.canvas.height);
+                this.context.font = this.other_players[Config_1.KEY_RADIUS] * this.canvas.width / 1.5 + 'px lobster';
+                let width = Math.round(this.other_players[Config_1.KEY_RADIUS] * 10000) / 100;
+                this.context.fillText(String(width), (this.other_players['x'] - this.other_players[Config_1.KEY_RADIUS] / 2) * this.canvas.width, (this.other_players['y'] + this.other_players[Config_1.KEY_RADIUS] / 2) * this.canvas.height);
             }
         }
         _drawFood() {
             for (let i = 0; i < this.state.food_length; i++) {
                 let food = this.state.food[i];
-                food = new Food_1.Food(this.context, this.canvas, food.x, food.y, food.width, food.height, food.color, food.radius);
+                food = new Food_1.Food(this.context, this.canvas, food['x'], food['y'], food[Config_1.KEY_RADIUS], food[Config_1.KEY_RADIUS], food[Config_1.KEY_COLOR], food[Config_1.KEY_RADIUS]);
                 food.draw(this.context);
             }
         }
         _drawEnemies() {
             for (let i = 0; i < this.state.enemies_length; i++) {
                 let enemy = this.state.enemies[i];
-                enemy = new Player_1.Player(this.context, this.canvas, enemy.x, enemy.y, enemy.width, enemy.height, enemy.color, enemy.radius, enemy.acceleration);
+                enemy = new Player_1.Player(this.context, this.canvas, enemy['x'], enemy['y'], enemy[Config_1.KEY_RADIUS], enemy[Config_1.KEY_RADIUS], enemy[Config_1.KEY_COLOR], enemy.radius, enemy.acceleration);
                 this.context.beginPath();
                 this.context.fillStyle = enemy.color;
-                this.context.arc(enemy.x * this.canvas.width, enemy.y * this.canvas.height, enemy.radius * this.canvas.width, 0, Math.PI * 2);
+                this.context.arc(enemy['x'] * this.canvas.width, enemy['y'] * this.canvas.height, enemy.radius * this.canvas.width, 0, Math.PI * 2);
                 this.context.fill();
                 this.context.fillStyle = 'black';
-                this.context.font = enemy.width * this.canvas.width / 1.5 + 'px lobster';
-                let width = Math.round(enemy.width * 10000) / 100;
-                this.context.fillText(String(width), (enemy.x - enemy.width / 2) * this.canvas.width, (enemy.y + enemy.height / 2) * this.canvas.height);
+                this.context.font = enemy[Config_1.KEY_RADIUS] * this.canvas.width / 1.5 + 'px lobster';
+                let width = Math.round(enemy[Config_1.KEY_RADIUS] * 10000) / 100;
+                this.context.fillText(String(width), (enemy['x'] - enemy[Config_1.KEY_RADIUS] / 2) * this.canvas.width, (enemy['y'] + enemy[Config_1.KEY_RADIUS] / 2) * this.canvas.height);
             }
         }
         _gameCameraCoordinates() {
@@ -247,29 +265,29 @@ define("game", ["require", "exports", "Field", "Player", "Painter", "Config"], f
             this.field = new Field_1.Field(this.context, this.canvas, 0, 0, 1, 1, Config_2.BACKGROUND_COLOR);
             this.player = new Player_2.Player(this.context, this.canvas, this.canvas.width / 2, this.canvas.height / 2, Config_2.PLAYER_SIZE, Config_2.PLAYER_SIZE, Config_2.PLAYER_COLOR, Config_2.PLAYER_RADIUS, Config_2.PLAYER_ACCELERATION);
             this.draw = new Painter_1.Painter();
-            socket.emit("n");
+            socket.emit(Config_2.KEY_NEW_PLAYER);
             this.canvas.onclick = (event) => {
                 this.start = true;
             };
-            socket.on("c", () => {
-                socket.on("u", (state) => {
+            socket.on(Config_2.KEY_PLAYER_CREATED, () => {
+                socket.on(Config_2.KEY_UPDATE_DATA, (state) => {
                     let newState = JSON.parse(state);
-                    this.state.players = newState["p"];
-                    this.state.food = newState["f"];
+                    this.state.players = newState[Config_2.KEY_PLAYERS];
+                    this.state.food = newState[Config_2.KEY_FOOD];
                     this.state.food_length = 0;
                     for (let property in this.state.food) {
                         if (Object.prototype.hasOwnProperty.call(this.state.food, property)) {
-                            this.state.food_width = newState["f"]["radius"];
-                            this.state.food_radius = newState["f"]["radius"];
+                            this.state.food_width = newState[Config_2.KEY_FOOD][Config_2.KEY_RADIUS];
+                            this.state.food_radius = newState[Config_2.KEY_FOOD][Config_2.KEY_RADIUS];
                             this.state.food_length++;
                         }
                     }
-                    this.state.enemies = newState["e"];
+                    this.state.enemies = newState[Config_2.KEY_ENEMIES];
                     this.state.enemies_length = 0;
                     for (let property in this.state.enemies) {
                         if (Object.prototype.hasOwnProperty.call(this.state.enemies, property)) {
-                            this.state.enemies_width = newState["e"]["radius"];
-                            this.state.enemies_radius = newState["e"]["radius"];
+                            this.state.enemies_width = newState[Config_2.KEY_ENEMIES][Config_2.KEY_RADIUS];
+                            this.state.enemies_radius = newState[Config_2.KEY_ENEMIES][Config_2.KEY_RADIUS];
                             this.state.enemies_length++;
                         }
                     }
@@ -280,10 +298,10 @@ define("game", ["require", "exports", "Field", "Player", "Painter", "Config"], f
                 this._resize();
             });
             this._resize();
-            // requestAnimationFrame(this.onLoop.bind(this));
-            setInterval(() => {
-                this.onLoop();
-            }, 1000 / 15);
+            requestAnimationFrame(this.onLoop.bind(this));
+            //  setInterval(() => {
+            //      this.onLoop();
+            //  }, 1000 / 30);
         }
         _update() {
             this._mouseCoordinates();
@@ -292,14 +310,13 @@ define("game", ["require", "exports", "Field", "Player", "Painter", "Config"], f
             addEventListener("mousemove", (event) => {
                 this.movement["x"] = (event.offsetX / this.canvas.clientWidth);
                 this.movement["y"] = (event.offsetY / this.canvas.clientHeight);
-                socket.emit("m", JSON.stringify(this.movement));
+                socket.emit(Config_2.KEY_MOVEMENT, JSON.stringify(this.movement));
             });
         }
         onLoop() {
-            console.log(1);
             this._update();
             this.draw.paint(this.context, this.canvas, this.state.players, this.movement, this.player, this.field, this.start, this.state.food_length, this.state.enemies_length, this.state.food, this.state.enemies);
-            //requestAnimationFrame(this.onLoop.bind(this));
+            requestAnimationFrame(this.onLoop.bind(this));
         }
         _resize() {
             let canvas = this.canvas;
