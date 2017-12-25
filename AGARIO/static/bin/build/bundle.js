@@ -298,10 +298,10 @@ define("game", ["require", "exports", "Field", "Player", "Painter", "Config"], f
                 this._resize();
             });
             this._resize();
-            requestAnimationFrame(this.onLoop.bind(this));
-            //  setInterval(() => {
-            //      this.onLoop();
-            //  }, 1000 / 30);
+            //requestAnimationFrame(this.onLoop.bind(this));
+            setInterval(() => {
+                this.onLoop();
+            }, 1000 / 30);
         }
         _update() {
             this._mouseCoordinates();
@@ -316,7 +316,7 @@ define("game", ["require", "exports", "Field", "Player", "Painter", "Config"], f
         onLoop() {
             this._update();
             this.draw.paint(this.context, this.canvas, this.state.players, this.movement, this.player, this.field, this.start, this.state.food_length, this.state.enemies_length, this.state.food, this.state.enemies);
-            requestAnimationFrame(this.onLoop.bind(this));
+            //requestAnimationFrame(this.onLoop.bind(this));
         }
         _resize() {
             let canvas = this.canvas;

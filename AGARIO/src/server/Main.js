@@ -6,7 +6,10 @@ import {Initializer} from './InitializerPosition';
 import {
   KEY_MOVEMENT,
   KEY_UPDATE_DATA,
-  KEY_PLAYERS
+  KEY_PLAYERS,
+  KEY_RADIUS,
+  KEY_TABLE,
+  KEY_NICKNAME
 } from './Config';
 
 const express = require('express');
@@ -39,8 +42,11 @@ const initializer = new Initializer();
 let state = {
   "p": {},
   "f": initializer.foodPosition(food),
-  "e": initializer.enemiesPosition(enemies)
+  "e": initializer.enemiesPosition(enemies),
+  "z": {}
 };
+
+let table = [];
 
 io.on('connection',  function (socket) {
   NewPlayer.create(socket, state);
@@ -61,13 +67,28 @@ io.on('connection',  function (socket) {
 setInterval(function () {
   collisionChecker.check(state, food, enemies);
   movementController.moveEnemy(state);
-  if (state[KEY_PLAYERS].size > 1)
+  table = [];
+  state[KEY_TABLE] = {};
+  const keys = Object.keys(state[KEY_PLAYERS]);
+  let i, len = keys.length;
+  for (i = 0; i < len; i++) {
+    let k = keys[i];
+    let radius = state[KEY_PLAYERS][k][KEY_RADIUS];
+    let nickname = state[KEY_PLAYERS][k][KEY_NICKNAME];
+    let infoBox = [radius, nickname];
+    table.push(infoBox);
+  }
+  if (table.length > 1)
   {
-    state[KEY_PLAYERS].sort((playerOne, playerTwo) => {
-      const scoreOne = playerOne.radius;
-      const scoreTwo = playerTwo.radius;
-      return scoreOne - scoreTwo;
-    });
+    table.sort((playerOne, playerTwo) => {
+        const scoreOne = playerOne[0];
+        const scoreTwo = playerTwo[0];
+        return scoreTwo - scoreOne;
+      });
+  }
+  for (i = 0; i < len; i++)
+  {
+    state[KEY_TABLE][i] = table[i][1];
   }
   io.sockets.emit(KEY_UPDATE_DATA, JSON.stringify(state));
 }, 1000 / 60);

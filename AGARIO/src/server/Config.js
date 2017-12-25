@@ -32,6 +32,7 @@ const KEY_RADIUS = "r";
 const KEY_COLOR = "l";
 const KEY_ACCELERATION = "a";
 const KEY_NICKNAME = "n";
+const KEY_TABLE = "z";
 export {
   MAX_FOOD_NUMBER,
   SMALL_BALL_SIZE,
@@ -61,5 +62,6 @@ export {
   KEY_RADIUS,
   KEY_COLOR,
   KEY_ACCELERATION,
-  KEY_NICKNAME
+  KEY_NICKNAME,
+  KEY_TABLE
 }

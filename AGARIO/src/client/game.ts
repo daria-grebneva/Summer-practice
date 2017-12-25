@@ -93,7 +93,7 @@ class Game {
         });
         this._resize();
 
-       requestAnimationFrame(this.onLoop.bind(this));
+        requestAnimationFrame(this.onLoop.bind(this));
        //  setInterval(() => {
        //      this.onLoop();
        //  }, 1000 / 30);

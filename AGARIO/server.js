@@ -107,6 +107,7 @@ var KEY_RADIUS = "r";
 var KEY_COLOR = "l";
 var KEY_ACCELERATION = "a";
 var KEY_NICKNAME = "n";
+var KEY_TABLE = "z";
 exports.MAX_FOOD_NUMBER = MAX_FOOD_NUMBER;
 exports.SMALL_BALL_SIZE = SMALL_BALL_SIZE;
 exports.SMALL_BALL_RADIUS = SMALL_BALL_RADIUS;
@@ -136,6 +137,7 @@ exports.KEY_RADIUS = KEY_RADIUS;
 exports.KEY_COLOR = KEY_COLOR;
 exports.KEY_ACCELERATION = KEY_ACCELERATION;
 exports.KEY_NICKNAME = KEY_NICKNAME;
+exports.KEY_TABLE = KEY_TABLE;
 
 /***/ }),
 /* 1 */
@@ -259,8 +261,11 @@ var initializer = new _InitializerPosition.Initializer();
 var state = {
   "p": {},
   "f": initializer.foodPosition(food),
-  "e": initializer.enemiesPosition(enemies)
+  "e": initializer.enemiesPosition(enemies),
+  "z": {}
 };
+
+var table = [];
 
 io.on('connection', function (socket) {
   _NewPlayer.NewPlayer.create(socket, state);
@@ -281,12 +286,27 @@ io.on('connection', function (socket) {
 setInterval(function () {
   collisionChecker.check(state, food, enemies);
   movementController.moveEnemy(state);
-  if (state[_Config.KEY_PLAYERS].size > 1) {
-    state[_Config.KEY_PLAYERS].sort(function (playerOne, playerTwo) {
-      var scoreOne = playerOne.radius;
-      var scoreTwo = playerTwo.radius;
-      return scoreOne - scoreTwo;
+  table = [];
+  state[_Config.KEY_TABLE] = {};
+  var keys = Object.keys(state[_Config.KEY_PLAYERS]);
+  var i = void 0,
+      len = keys.length;
+  for (i = 0; i < len; i++) {
+    var k = keys[i];
+    var radius = state[_Config.KEY_PLAYERS][k][_Config.KEY_RADIUS];
+    var nickname = state[_Config.KEY_PLAYERS][k][_Config.KEY_NICKNAME];
+    var infoBox = [radius, nickname];
+    table.push(infoBox);
+  }
+  if (table.length > 1) {
+    table.sort(function (playerOne, playerTwo) {
+      var scoreOne = playerOne[0];
+      var scoreTwo = playerTwo[0];
+      return scoreTwo - scoreOne;
     });
+  }
+  for (i = 0; i < len; i++) {
+    state[_Config.KEY_TABLE][i] = table[i][1];
   }
   io.sockets.emit(_Config.KEY_UPDATE_DATA, JSON.stringify(state));
 }, 1000 / 60);
